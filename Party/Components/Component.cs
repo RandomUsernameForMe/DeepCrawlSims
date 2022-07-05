@@ -1,10 +1,11 @@
-﻿using System;
+﻿using DeepCrawlSims.QueryNamespace;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DeepCrawlSims.Party.Components
+namespace DeepCrawlSims.PartyNamespace.Components
 {
-
+    [Serializable()]
     public abstract class Component
     {
         abstract public List<(Type, Type)> GetRequirements();

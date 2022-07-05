@@ -1,5 +1,6 @@
 ﻿using DeepCrawlSims.BattleControl;
-using DeepCrawlSims.Party;
+using DeepCrawlSims.PartyNamespace;
+using DeepCrawlSims.QueryNamespace;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -7,7 +8,7 @@ using System.Text;
 namespace DeepCrawlSims.AI
 {
 
-
+    [Serializable()]
     public class Controller
     {
         public BattleManager manager;
@@ -19,11 +20,12 @@ namespace DeepCrawlSims.AI
         public void CreatureActs(Creature creature)
         {
             // theres now a 250% chance of a calculated attack
-            int rnd = Random.Range(0, 2); //TODO
+            Random rnd = new Random();
+            int rndInt = rnd.Next(0, 2);
             Query query = null; ;
             Creature target = null; ;
 
-            if (rnd == 1)
+            if (rndInt == 1)
             {
                 // Choose attack 
                 (int, int) t = PickActionToPlay(creature);
@@ -39,7 +41,7 @@ namespace DeepCrawlSims.AI
                     query = new Query(QueryType.AttackBuild);
                     if (t.Item1 == 0) query.Add(QueryParameter.Basic, 0);
                     else query.Add(QueryParameter.Special, 0);
-                    query = creature.GetComponent<QueryHandler>().ProcessQuery(query);
+                    query = creature.ProcessQuery(query);
 
                     // Prepare target 
                     target = TargetingSystem.GetCreatureByPosition(t.Item2, manager);
@@ -51,12 +53,12 @@ namespace DeepCrawlSims.AI
                 for (int i = 0; i < 3; i++)
                 {
                     if (!found)
-                    {
-                        rnd = UnityEngine.Random.Range(0, 2);
+                    {                        
+                        rndInt = rnd.Next(0, 2);                        
                         query = new Query(QueryType.AttackBuild);
-                        if (rnd == 0) query.Add(QueryParameter.Basic, 0);
+                        if (rndInt == 0) query.Add(QueryParameter.Basic, 0);
                         else query.Add(QueryParameter.Special, 0);
-                        query = creature.GetComponent<QueryHandler>().ProcessQuery(query);
+                        query = creature.ProcessQuery(query);
                         found = ActionHasViableTargets(query, creature);
                     }
                 }
@@ -79,7 +81,7 @@ namespace DeepCrawlSims.AI
 
                 query = new Query(QueryType.AttackBuild);
                 query.Add(QueryParameter.Basic, 0);
-                query = creature.GetComponent<QueryHandler>().ProcessQuery(query);
+                query = creature.ProcessQuery(query);
                 List<QueryParameter> keys = new List<QueryParameter>(query.parameters.Keys);
                 List<int> pos = TargetingSystem.PickViableTargets(keys, creature.isEnemy);
 
@@ -87,7 +89,7 @@ namespace DeepCrawlSims.AI
 
                 query = new Query(QueryType.AttackBuild);
                 query.Add(QueryParameter.Special, 0);
-                query = creature.GetComponent<QueryHandler>().ProcessQuery(query);
+                query = creature.ProcessQuery(query);
                 keys = new List<QueryParameter>(query.parameters.Keys);
                 pos = TargetingSystem.PickViableTargets(keys, creature.isEnemy);
 
@@ -116,7 +118,7 @@ namespace DeepCrawlSims.AI
                 Query query = new Query(origQuery);
                 Creature cre = TargetingSystem.GetCreatureByPosition(item, manager);
                 query.type = QueryType.Question;
-                query = cre.GetComponent<QueryHandler>().ProcessQuery(query);
+                query = cre.ProcessQuery(query);
                 results.Add((i, item), query.parameters[QueryParameter.CalcultedDmg]);
             }
         }
@@ -143,17 +145,12 @@ namespace DeepCrawlSims.AI
             var targetFound = false;
             Creature cre = null;
 
-
-            if (!ActionHasViableTargets(query, creature))
-            {
-                Debug.Log("problemo");
-            }
-
             //at the moment its random
             while (!targetFound)
             {
-                int rnd = UnityEngine.Random.Range(0, pos.Count);
-                cre = TargetingSystem.GetCreatureByPosition(pos[rnd], manager);
+                Random rnd = new Random();
+                int rndInt = rnd.Next(0, pos.Count);
+                cre = TargetingSystem.GetCreatureByPosition(pos[rndInt], manager);
                 if (!cre.Is(QueryParameter.Dead)) targetFound = true;
             }
             return cre;

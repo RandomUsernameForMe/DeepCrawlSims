@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DeepCrawlSims.BattleControl;
+using DeepCrawlSims.PartyNamespace;
+using System;
 
 namespace DeepCrawlSims
 {
@@ -6,7 +8,17 @@ namespace DeepCrawlSims
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Party party = TeamBuilder.CreateAllyTeam();
+            Party enemyParty = TeamBuilder.CreateEnemyTeam();
+            BattleManager manager = new BattleManager(party, enemyParty);
+            
+            SimulationRunner simRunner = new SimulationRunner(manager, 1000);
+            simRunner.Run();
+           
+            
+
+            Console.ReadLine();
+
         }
     }
 }

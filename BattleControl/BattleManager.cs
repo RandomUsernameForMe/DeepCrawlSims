@@ -1,5 +1,9 @@
-﻿using System;
+﻿using DeepCrawlSims.AI;
+using DeepCrawlSims.PartyNamespace;
+using DeepCrawlSims.QueryNamespace;
+using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace DeepCrawlSims.BattleControl
@@ -21,23 +25,28 @@ namespace DeepCrawlSims.BattleControl
     /// Main manager of the battle and moves within. 
     /// Controls the order of actions and assigns turns to creatures.
     /// </summary>
+    [Serializable()]
     public class BattleManager
     {
         public Party allyParty;
         public Party enemyParty;
         public Creature currentCreature;
-        public bool loaded = false;
-        public bool running = false;
+        private Controller controller; 
+        public bool running = true;
         public BattleResults results;
-        public float minimalTimeBetweenMoves;
         private int skipCounter;
         private bool artificialEnd = false;
 
-        
+        public BattleManager() { }
 
-        public delegate void OnCharacterPlayedEvent();
-        public static event OnCharacterPlayedEvent OnCharacterFinishedTurn;
-
+        public BattleManager(Party party, Party enemyParty)
+        {
+            this.allyParty = party;
+            this.enemyParty = enemyParty;
+            controller = new Controller();
+            controller.manager = this;
+            running = true;
+        }
 
 
         public void RunOneTurn()
@@ -53,31 +62,24 @@ namespace DeepCrawlSims.BattleControl
             else
             {
                 NextCreaturesTurn();
-                currentCreature.DecideYourMove();
+                controller.CreatureActs(currentCreature);
             }
         }
 
-        public void LoadAndReset()
-        {
-            if (allyParty == null) allyParty = GameObject.Find("AllyParty").GetComponent<Party>();
-            if (enemyParty == null) enemyParty = GameObject.Find("EnemyParty").GetComponent<Party>();
-            var spriteGenerator = GetComponent<SpriteGenerator>();
-            if (spriteGenerator != null) spriteGenerator.AssignSpritesToEnemyParty();
-            results = null;
+        public void Reset()
+        {            
             enemyParty.FullReset();
             allyParty.FullReset();
             running = true;
-            OnBattleLoaded();
         }
 
-        public void CurrentCreaturSkips()
+        public void CurrentCreatureSkips()
         {
             skipCounter++;
             if (skipCounter > 5)
             {
                 artificialEnd = true;
             }
-            OnCharacterFinishedTurn();
         }
 
         /// <summary>
@@ -100,26 +102,16 @@ namespace DeepCrawlSims.BattleControl
                 skipCounter = 0;
             }
 
-            if (query.type == QueryType.Swap)
-            {
-                Vector3 buffer = currentCreature.transform.position;
-                currentCreature.Move(target.transform.position);
-                target.Move(buffer);
-                target.UpdateUI();
-            }
-
             if (query.type == QueryType.Attack || query.type == QueryType.AttackBuild)
             {
                 // I want to play possible animations first because processing query through creatures might modify it
                 query.type = QueryType.Animation;
-                currentCreature.GetComponent<QueryHandler>().ProcessQuery(query);
+                currentCreature.ProcessQuery(query);
 
                 // And now i want the actually attack to proceed
                 query.type = QueryType.Attack;
-                target.GetComponent<QueryHandler>().ProcessQuery(query);
-                target.UpdateUI();
+                target.ProcessQuery(query);
             }
-            OnCharacterFinishedTurn();
         }
 
         /// <summary>
@@ -131,15 +123,15 @@ namespace DeepCrawlSims.BattleControl
             Creature nextCreature = null;
             bool found = false;
 
-            var playerCharacters = allyParty.GetParty();
-            var enemyCharacters = enemyParty.GetParty();
+            var playerCharacters = allyParty.Creatures;
+            var enemyCharacters = enemyParty.Creatures;
 
             while (!found)
             {
                 // Search for a character with highest speed that havent moved this turn
                 for (int i = 0; i < playerCharacters.Count; i++)
                 {
-                    var creature = playerCharacters[i].GetComponent<Creature>();
+                    var creature = playerCharacters[i];
                     int speed = creature.GetSpeed();
                     if (speed > max_speed)
                     {
@@ -150,7 +142,7 @@ namespace DeepCrawlSims.BattleControl
 
                 for (int i = 0; i < enemyCharacters.Count; i++)
                 {
-                    var creature = enemyCharacters[i].GetComponent<Creature>();
+                    var creature = enemyCharacters[i];
                     int speed = creature.GetSpeed();
                     if (speed > max_speed)
                     {
@@ -175,48 +167,65 @@ namespace DeepCrawlSims.BattleControl
         private BattleResults GenerateBattleResults()
         {
             var retVal = new BattleResults();
-            if (BattleTransitions.DidPartyLose(enemyParty))
+            if (DidPartyLose(enemyParty))
                 retVal.result = 1;
             else retVal.result = 2;
 
             retVal.allyHPs = new List<double>();
             retVal.enemyHPs = new List<double>();
-            foreach (var item in allyParty.party)
+            foreach (var item in allyParty.Creatures)
             {
-                retVal.allyHPs.Add(item.GetComponentInChildren<Creature>().GetHealth());
+                retVal.allyHPs.Add(item.GetHealth());
             }
-            foreach (var item in enemyParty.party)
+            foreach (var item in enemyParty.Creatures)
             {
-                retVal.enemyHPs.Add(item.GetComponentInChildren<Creature>().GetHealth());
+                retVal.enemyHPs.Add(item.GetHealth());
             }
 
             var allyMaxHPs = new List<double>();
             var enemyMaxHPs = new List<double>();
 
-            foreach (var item in allyParty.party)
+            foreach (var item in allyParty.Creatures)
             {
-                allyMaxHPs.Add(item.GetComponentInChildren<Creature>().GetMaxHealth());
+                allyMaxHPs.Add(item.GetMaxHealth());
             }
-            foreach (var item in enemyParty.party)
+            foreach (var item in enemyParty.Creatures)
             {
-                enemyMaxHPs.Add(item.GetComponentInChildren<Creature>().GetMaxHealth());
+                enemyMaxHPs.Add(item.GetMaxHealth());
             }
 
-            Debug.Log(String.Format("Starting HP: ({0},{1},{2},{3}) vs. ({4},{5},{6},{7})",
+            Console.WriteLine(String.Format("Starting HP: ({0},{1},{2},{3}) vs. ({4},{5},{6},{7})",
                 allyMaxHPs[0], allyMaxHPs[1], allyMaxHPs[2], allyMaxHPs[3],
                 enemyMaxHPs[0], enemyMaxHPs[1], enemyMaxHPs[2], enemyMaxHPs[3]));
 
-            //Debug.Log(String.Format("Result HP: ({0},{1},{2},{3},) vs. ({4},{5},{6},{7})",
-            //    retVal.allyHPs[0], retVal.allyHPs[1], retVal.allyHPs[2], retVal.allyHPs[3],
-            //    retVal.enemyHPs[0], retVal.enemyHPs[1], retVal.enemyHPs[2], retVal.enemyHPs[3]));
+            Console.WriteLine(String.Format("Result HP: ({0},{1},{2},{3},) vs. ({4},{5},{6},{7})",
+                retVal.allyHPs[0], retVal.allyHPs[1], retVal.allyHPs[2], retVal.allyHPs[3],
+                retVal.enemyHPs[0], retVal.enemyHPs[1], retVal.enemyHPs[2], retVal.enemyHPs[3]));
 
             return retVal;
         }
 
         private bool IsGameOver()
         {
-            return (BattleTransitions.DidPartyLose(allyParty) || BattleTransitions.DidPartyLose(enemyParty));
+            return (DidPartyLose(allyParty) || DidPartyLose(enemyParty));
         }
+
+        private bool DidPartyLose(Party party)
+        {
+            bool allDead = true;
+            foreach (var item in party.Creatures)
+            {
+                var query = new Query(QueryType.Question);
+                query.Add(QueryParameter.Dead, 0);
+                item.ProcessQuery(query);
+                if (query.parameters[QueryParameter.Dead] == 0)
+                {
+                    allDead = false;
+                }
+            }
+            return allDead;
+        }
+
 
         /// <summary>
         /// After all creatures have played, their speeds are refreshed and all timed status effects (like poison) trigger
@@ -225,7 +234,8 @@ namespace DeepCrawlSims.BattleControl
         {
             allyParty.TickTimedEffects();
             enemyParty.TickTimedEffects();
-            OnRoundEnded();
+            enemyParty.ResetSpeed();
+            allyParty.ResetSpeed();
         }
 
         public Creature GetCurrentCreature()

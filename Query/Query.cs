@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using DeepCrawlSims.PartyNamespace.Components;
+using System.Collections.Generic;
 
-namespace DeepCrawlSims.Query
+namespace DeepCrawlSims.QueryNamespace
 {
     public enum QueryType
     {
@@ -49,22 +49,22 @@ namespace DeepCrawlSims.Query
         FireDmg,
         Executioner,
     }
-    public class MyQuery
+    public class Query
     {
         public QueryType type;
         public Dictionary<QueryParameter, double> parameters;
         public List<string> descs = new List<string>();
         public Dictionary<QueryParameter, Component> effects = new Dictionary<QueryParameter, Component>();
 
-        public static MyQuery question = new MyQuery(QueryType.Question);
+        public static Query question = new Query(QueryType.Question);
 
-        public MyQuery(QueryType type)
+        public Query(QueryType type)
         {
             this.type = type;
             parameters = new Dictionary<QueryParameter, double>();
         }
 
-        public MyQuery(MyQuery other)
+        public Query(Query other)
         {
             this.type = other.type;
             parameters = new Dictionary<QueryParameter, double>(other.parameters);

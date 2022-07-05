@@ -1,42 +1,49 @@
 ﻿using DeepCrawlSims.BattleControl;
-using DeepCrawlSims.Query;
+using DeepCrawlSims.QueryNamespace;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace DeepCrawlSims.Party
+namespace DeepCrawlSims.PartyNamespace
 {
 
     /// <summary>
     /// Structure holding and managing a group of creatures, ally or foe.
     /// Ally party is transfered in between senes, Enemy party is generated in each battle.
     /// </summary>
+    [Serializable()]
     public class Party 
     {
-        public List<Creature> creatures;
+        private List<Creature> creatures;
+
+        public Party()
+        {
+            creatures = new List<Creature>();
+        }
+
+        public List<Creature> Creatures { get => creatures; set => creatures = value; }
 
         /// <summary>
         /// Triggers timed effects such as poison or stun.
         /// </summary>
         public void TickTimedEffects()
         {
-            for (int i = 0; i < creatures.Count; i++)
+            for (int i = 0; i < Creatures.Count; i++)
             {
-                var effects = creatures[i].GetComponentsInChildren<TimedEffect>();
-                var partyCreatures = GetParty();
-                Creature creature = partyCreatures[i];
+                
+                Creature creature = Creatures[i];
+                var effects = creature.FetchComponents<TimedEffect>();
 
-                for (int j = 0; j < effects.Length; j++)
+                for (int j = 0; j < effects.Count; j++)
                 {
                     var item = effects[j];
                     if (item.active)
                     {
-                        MyQuery action = item.Tick();
-                        creature.ProcessQuery(action);
+                        Query action = item.Tick();
+                        object p = creature.ProcessQuery(action);
                         if (item.timer <= 0)
                         {
-                            Destroy(item);
-                            item.active = false;
+                            creature.components.Remove(item);
                         }
                     }
                 }
@@ -45,7 +52,7 @@ namespace DeepCrawlSims.Party
 
         internal void FullReset()
         {
-            foreach (var item in creatures)
+            foreach (var item in Creatures)
             {
                 item.FullReset(); ;
             }
@@ -53,23 +60,22 @@ namespace DeepCrawlSims.Party
 
         public void ResetSpeed()
         {
-
-            for (int i = 0; i < creatures.Count; i++)
+            for (int i = 0; i < Creatures.Count; i++)
             {
-                creatures[i].ResetSpeed();
+                Creatures[i].ResetSpeed();
             }
         }
 
         public override string ToString()
         {
             var HPs = new List<double>();
-            foreach (var item in creatures)
+            foreach (var item in Creatures)
             {
-                HPs.Add(item.GetMaxHealth());
+                HPs.Add(item.GetHealth());
             }
 
             var names = new List<string>();
-            foreach (var item in creatures)
+            foreach (var item in Creatures)
             {
                 names.Add(item.name);
             }

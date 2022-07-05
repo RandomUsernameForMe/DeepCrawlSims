@@ -1,6 +1,6 @@
 ﻿using DeepCrawlSims.BattleControl;
-using DeepCrawlSims.Party;
-using DeepCrawlSims.Query;
+using DeepCrawlSims.PartyNamespace;
+using DeepCrawlSims.QueryNamespace;
 using System.Collections.Generic;
 
 namespace DeepCrawlSims.AI
@@ -61,7 +61,7 @@ namespace DeepCrawlSims.AI
                 party = manager.enemyParty;
                 pos = pos - 4;
             }
-            return party.GetParty()[pos].GetComponentInChildren<Creature>();
+            return party.Creatures[pos];
         }
     }
 
