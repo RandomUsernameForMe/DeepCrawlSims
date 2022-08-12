@@ -28,6 +28,14 @@ namespace DeepCrawlSims.PartyNamespace
             components = new List<Component>();
         }
 
+        public Creature()
+        {
+            this.name = "defaultName";
+            this.isEnemy = false;
+            controller = new Controller();
+            components = new List<Component>();
+        }
+
         /// <summary>
         /// Convenient way to ask if a creature is dead, sick, stuned or similar
         /// </summary>

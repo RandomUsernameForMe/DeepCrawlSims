@@ -116,10 +116,5 @@ public class SimulationRunner
         float winrate = 100 * ((float)wins / (wins + loses));
         return (int) (winrate-targetWinrate)/3; //změnit počet bodů zde
     }
-
-    private Party GenerateEnemyParty(int upgradepoints) //TODP
-    {
-        return null;
-    }
 }
 
