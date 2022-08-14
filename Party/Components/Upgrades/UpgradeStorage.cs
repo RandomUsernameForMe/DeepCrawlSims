@@ -67,14 +67,14 @@ public class UpgradeStorage
                 new ComponentCondition<Health>(),
                 new ComponentUpgrade<ElementalResistance>(),
                 2,
-                "",
-                ""));
+                "Get elemental resistance",
+                "Add 10% resistance against fire and posion."));
             positiveUpgrades.Add(new UpgradeWithCondition(
                 new ComponentCondition<Speed>(),
                 new ComponentUpgrade<Speed>(),
                 2,
                 "Get quicker",
-                "Get +1 to your speed, making you play earlier. Costs 2 to upgrade."));
+                "Add +1 to your speed, making you play earlier. Costs 2 to upgrade."));
 
             positive = positiveUpgrades;
         }

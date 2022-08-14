@@ -6,8 +6,8 @@ using DeepCrawlSims.QueryNamespace;
 [Serializable()]
 public class PoisonBlast: UpgradableComponent
 {
-    public int potency;
-    public int duration;
+    public int potency = 10;
+    public int duration = 2;
     private int upgradeLevel = 1;
 
     public override Query ProcessQuery(Query action)

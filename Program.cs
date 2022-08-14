@@ -22,8 +22,7 @@ namespace DeepCrawlSims
             Console.ReadLine();
 
 
-            SimulationRunner simRunner = new SimulationRunner(manager, 1000);
-            simRunner.Run();
+            
           
 
         }

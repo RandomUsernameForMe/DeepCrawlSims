@@ -62,7 +62,7 @@ public class Health : UpgradableComponent
         {
             if (query.parameters.ContainsKey(QueryParameter.Tooltip))
             {
-                query.Add(String.Format("Health: {0}", health));
+                query.Add(String.Format("Health: {0}", maxHealth));
             }
         }
         return query;

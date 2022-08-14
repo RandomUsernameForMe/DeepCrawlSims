@@ -9,16 +9,15 @@ namespace DeepCrawlSims.Simulations
 {
     class SimulationsUI
     {
-        const int RUN_CONST = 3;
+        const int RUN_CONST = 2;
+        const int MENU_CONST = 1;
 
-        BattleManager battleManager;
-        int command;
-        Party currentParty;
-        Creature currentCreature;
+        BattleManager manager;
+        int command = MENU_CONST;
 
         public SimulationsUI(BattleManager battleManager)
         {
-            this.battleManager = battleManager;
+            manager = battleManager;
         }
 
         public void Run()
@@ -27,22 +26,15 @@ namespace DeepCrawlSims.Simulations
             {
                 switch (command)
                 {
-                    case 1:
+                    case MENU_CONST:
+                        ShowMainMenuToConsole();
                         break;
-                    case 2:
+                    case RUN_CONST:
+                        SimulationRunner simRunner = new SimulationRunner(manager, 1000);
+                        simRunner.Run();
                         break;
-                    case 1:
-                        break;
-                    case 1:
-                        break;
-                    case 1:
-                        break;
-                    default:
                 }
             }
-            ShowPartyToConsole(battleManager.allyParty);
-            ShowPartyToConsole(battleManager.enemyParty);
-
         }
 
         public void ShowPartyToConsole(Party party)
@@ -50,12 +42,7 @@ namespace DeepCrawlSims.Simulations
             Console.Clear();
             foreach (var creature in party.Creatures)
             {
-                Console.WriteLine();
-                Console.WriteLine("Name: {0}", creature.name);
-                Query query = new Query(QueryType.Description);
-                query.Add(QueryParameter.Tooltip,0);
-                string description = string.Join("\n",creature.ProcessQuery(query).descs);
-                Console.WriteLine(description);
+                ShowCreatureToConsole(creature);
             }
 
             Console.WriteLine("What do you want to do now? (enter apropriate number)");
@@ -71,10 +58,19 @@ namespace DeepCrawlSims.Simulations
             if (input >0 && input <5)
             {
                 ShowUpgradesToConsole(party.Creatures[input - 1]);
-            }
-            
+            }            
         }
-        public void ShowMainMenuToConsole(Party party)
+
+        public void ShowCreatureToConsole(Creature creature)
+        {
+            Console.WriteLine("Name: {0}", creature.name);
+            Query query = new Query(QueryType.Description);
+            query.Add(QueryParameter.Tooltip, 0);
+            string description = string.Join("\n", creature.ProcessQuery(query).descs);
+            Console.WriteLine(description);
+            Console.WriteLine();
+        }
+        public void ShowMainMenuToConsole()
         {
             Console.Clear();
             Console.WriteLine("What do you want to do now? (enter apropriate number)");
@@ -92,16 +88,16 @@ namespace DeepCrawlSims.Simulations
             switch (input)
             {
                 case 1:
-                    ShowPartyToConsole(battleManager.allyParty);
+                    ShowPartyToConsole(manager.allyParty);
                     break;
                 case 2:
-                    ShowPartyToConsole(battleManager.enemyParty);
+                    ShowPartyToConsole(manager.enemyParty);
                     break;
                 case 3:
-                    ShowPartyToConsole(battleManager.allyParty); //TODO
+                    ShowPartyToConsole(manager.allyParty); //TODO
                     break;
                 case 4:
-                    command = RUN_CONST;
+                    command = 2;
                     break;
             }
 
@@ -110,10 +106,49 @@ namespace DeepCrawlSims.Simulations
 
         public void ShowUpgradesToConsole(Creature creature)
         {
-            foreach (var item in creature.components)
+            Console.Clear();
+
+            ShowCreatureToConsole(creature);
+            List<UpgradeWithCondition> passed = new List<UpgradeWithCondition>();
+            foreach (var item in UpgradeStorage.GetPositiveUpgrades())
             {
-                if 
+                item.Condition.creature = creature;
+                if (item.Condition.isPassed())
+                {
+                    passed.Add(item);
+                }
             }
+
+            Console.WriteLine("What do you want to do now? (enter apropriate number)");
+            int counter = 0;
+            foreach (var item in passed)
+            {
+                counter++;
+                Console.WriteLine("{0}:{1} ({2})", counter, item.Upgrade.buttonText, item.Upgrade.descriptionText);
+            }
+            counter++;
+            Console.WriteLine("{0}: Go back",counter);
+
+            int input = 0;
+            while (input != -1)
+            {
+                input = Console.ReadLine()[0] - '0';
+                if (input < counter && input > 0)
+                {
+                    if (passed[input - 1].TryApplyUpgrade(creature, true, true))
+                    {
+                        Console.WriteLine("Upgrade Succesful!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("For some reason, upgrade failed.");
+                    }
+                }
+                if (input == counter)
+                {
+                    input = -1;
+                }                
+            }            
         }
     }
 }

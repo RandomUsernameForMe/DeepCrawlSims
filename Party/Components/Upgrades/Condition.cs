@@ -32,9 +32,13 @@ public class ComponentCondition<T> : CreatureCondition
         this.boolHelper = boolean;
     }
 
-    override public bool isPassed() //TODO
+    override public bool isPassed()
     {
-        throw new NotImplementedException();
+        foreach (var item in creature.components)
+        {
+            if (item is T) return true;
+        }
+        return false;
     }
 }
 

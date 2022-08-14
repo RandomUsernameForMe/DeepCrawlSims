@@ -6,7 +6,7 @@ using System.Collections.Generic;
 [Serializable()]
 public class PowerStrike : UpgradableComponent
 {
-    public double power;
+    public double power = 15;
 
     public override Query ProcessQuery(Query action)
     {
