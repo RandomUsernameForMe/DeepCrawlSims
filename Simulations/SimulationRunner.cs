@@ -18,6 +18,7 @@ public class SimulationRunner
     public int simCount = 100;
     public float targetWinrate;
     public float winrateTolerance;
+    public bool finished = false;
 
     internal async void Run()
     {
@@ -31,6 +32,9 @@ public class SimulationRunner
         ShowResults(results);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
+        Console.WriteLine($"Press Any Key to continue");
+        Console.ReadLine();
+        finished = true;
     }
 
     private List<BattleResults> RunBattles(BattleManager manager,int battleCount)

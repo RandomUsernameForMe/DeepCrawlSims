@@ -43,7 +43,7 @@ namespace DeepCrawlSims.PartyNamespace
         /// <returns>Answer</returns>
         public bool Is(QueryParameter ind)
         {
-            var query = Query.question;
+            var query = new Query(QueryType.Question);
             query.Add(ind, 0);
             query = ProcessQuery(query);
             if (query.parameters[ind] == 0)

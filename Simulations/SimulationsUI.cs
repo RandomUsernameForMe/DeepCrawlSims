@@ -11,6 +11,7 @@ namespace DeepCrawlSims.Simulations
     {
         const int RUN_CONST = 2;
         const int MENU_CONST = 1;
+        const int BUSY_CONST = 3;
 
         BattleManager manager;
         int command = MENU_CONST;
@@ -22,6 +23,7 @@ namespace DeepCrawlSims.Simulations
 
         public void Run()
         {
+            SimulationRunner simRunner = new SimulationRunner(manager, 1000);
             while (command != 0)
             {
                 switch (command)
@@ -29,9 +31,16 @@ namespace DeepCrawlSims.Simulations
                     case MENU_CONST:
                         ShowMainMenuToConsole();
                         break;
-                    case RUN_CONST:
-                        SimulationRunner simRunner = new SimulationRunner(manager, 1000);
+                    case RUN_CONST:                        
                         simRunner.Run();
+                        command = BUSY_CONST;
+                        break;
+                    case BUSY_CONST:
+                        if (simRunner.finished)
+                        {
+                            command = MENU_CONST;
+                            simRunner.finished = false;
+                        }
                         break;
                 }
             }
@@ -94,7 +103,7 @@ namespace DeepCrawlSims.Simulations
                     ShowPartyToConsole(manager.enemyParty);
                     break;
                 case 3:
-                    ShowPartyToConsole(manager.allyParty); //TODO
+                    
                     break;
                 case 4:
                     command = 2;

@@ -10,9 +10,9 @@ namespace DeepCrawlSims
         static void Main(string[] args)
         {
             Party party = TeamBuilder.CreateAllyTeam();
-            PartySerializer.Serialize(party, "party.txt");
+            PartySerializer.Serialize(party, "Setups/default");
 
-            party = PartySerializer.Deserialize("party.txt");
+            party = PartySerializer.Deserialize("Setups/default");
             Party enemyParty = TeamBuilder.CreateEnemyTeam();
             BattleManager manager = new BattleManager(party, enemyParty);
 
