@@ -19,50 +19,50 @@ public class UpgradeStorage
                 new ComponentUpgrade<Health>(),
                 2,
                 "Raise Health", 
-                "Raises maximum health by 10, costs 2 points."));
+                "Raises maximum health by 10."));
             positiveUpgrades.Add(new UpgradeWithCondition(
                 new ComponentCondition<Health>(), 
                 new ComponentUpgrade<Armor>(),
                 1,
                 "Armor Up", 
-                "You reduce physical damage by 3 more, costs 1 point."));
+                "You reduce physical damage by 3 more."));
             positiveUpgrades.Add(new UpgradeWithCondition(
                 new ComponentCondition<PhysicalWeapon>(), 
                 new ComponentUpgrade<PhysicalWeapon>(),
                 2,
                 "Sharpen Weapon", 
-                "Your weapon will deal 5 more physical damage, costs 2 points."));
+                "Your weapon will deal 5 more physical damage."));
             positiveUpgrades.Add(new UpgradeWithCondition(
                 new ComponentCondition<PoisonBlast>(), 
                 new ComponentUpgrade<PoisonBlast>(),
                 2, 
                 "Brew better poison", 
-                "Increases strength or duration of your poison, costs 2 points."));
+                "Increases strength or duration of your poison."));
             positiveUpgrades.Add(new UpgradeWithCondition(
                 new ComponentCondition<HealingWave>(), 
                 new ComponentUpgrade<HealingWave>(),
                 2,
                 "Improve Healing",
-                "You heal for 10 more health, costs 2 points."));
+                "You heal for 10 more health"));
             
             positiveUpgrades.Add(new UpgradeWithCondition(
                 new ComponentCondition<PowerStrike>(),
                 new ComponentUpgrade<PowerStrike>(),
                 2,
                 "Upgrade PowerStrike",
-                "Smash even more, costs 2 points."));
+                "Smash even more."));
             positiveUpgrades.Add(new UpgradeWithCondition(
                 new ComponentCondition<Claws>(),
                 new ComponentUpgrade<Claws>(),
                 2,
-                "",
-                ""));
+                "Grow bigger claws",
+                "Increases claws damage by 5."));
             positiveUpgrades.Add(new UpgradeWithCondition(
                 new ComponentCondition<PhysicalWeapon>(),
                 new ComponentUpgrade<FieryWeapons>(),
                 2,
                 "Enflame Weapons",
-                "Set your weapons ablaze. Deal bonus fire damage that ignores armor. Costs 2 points"));
+                "Set your weapons ablaze. Deal bonus fire damage that ignores armor."));
             positiveUpgrades.Add(new UpgradeWithCondition(
                 new ComponentCondition<Health>(),
                 new ComponentUpgrade<ElementalResistance>(),
@@ -74,28 +74,10 @@ public class UpgradeStorage
                 new ComponentUpgrade<Speed>(),
                 2,
                 "Get quicker",
-                "Add +1 to your speed, making you play earlier. Costs 2 to upgrade."));
+                "Add +1 to your speed, making you play earlier."));
 
             positive = positiveUpgrades;
         }
         return positive;
-    }
-
-    public static List<UpgradeWithCondition> GetNegativeUpgrades()
-    {
-
-        if (negative == null)
-        {
-            var negativeUpgrades = new List<UpgradeWithCondition>();
-            negativeUpgrades.Add(new UpgradeWithCondition(new ComponentCondition<Health>(), new ComponentUpgrade<Health>(),2));
-            negativeUpgrades.Add(new UpgradeWithCondition(new ComponentCondition<Armor>(), new ComponentUpgrade<Armor>(),2));
-            negativeUpgrades.Add(new UpgradeWithCondition(new ComponentCondition<PhysicalWeapon>(), new ComponentUpgrade<PhysicalWeapon>(),2));
-            negativeUpgrades.Add(new UpgradeWithCondition(new ComponentCondition<PowerStrike>(), new ComponentUpgrade<PowerStrike>(), 2));
-            negativeUpgrades.Add(new UpgradeWithCondition(new ComponentCondition<Claws>(), new ComponentUpgrade<Claws>(), 2));
-            negativeUpgrades.Add(new UpgradeWithCondition(new ComponentCondition<FieryWeapons>(), new ComponentUpgrade<FieryWeapons>(), 2));
-            negativeUpgrades.Add(new UpgradeWithCondition(new ComponentCondition<Speed>(), new ComponentUpgrade<Speed>(), 2));
-            negative = negativeUpgrades;
-        }
-        return negative;
     }
 }

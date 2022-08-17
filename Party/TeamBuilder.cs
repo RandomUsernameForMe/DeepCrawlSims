@@ -8,22 +8,24 @@ namespace DeepCrawlSims
 
         internal static Party CreateEnemyTeam()
         {
-            return CreateTeam(true);
+            var party = new Party();
+            party.Creatures.Add(GeneratePoisonMage("Mage1"));
+            party.Creatures.Add(GenerateFighter("Fighter1"));
+            party.Creatures.Add(GenerateClawer("Clawer1"));
+            party.Creatures.Add(GenerateClawer("Clawer2"));
+            foreach (var item in party.Creatures) { item.isEnemy = false; }
+
+            return party;
         }
 
         internal static Party CreateAllyTeam()
         {
-            return CreateTeam(false);
-        }
-
-        internal static Party CreateTeam(bool isEnemy)
-        {
             var party = new Party();
             party.Creatures.Add(GeneratePoisonMage("Mage1"));
-            party.Creatures.Add(GeneratePoisonMage("Mage2"));
+            party.Creatures.Add(GenerateHealer("Healer1"));
             party.Creatures.Add(GenerateFighter("Fighter1"));
             party.Creatures.Add(GenerateFighter("Fighter2"));
-            foreach (var item in party.Creatures) { item.isEnemy = isEnemy;}
+            foreach (var item in party.Creatures) { item.isEnemy = false; }
 
             return party;
         }
@@ -46,6 +48,28 @@ namespace DeepCrawlSims
             creature.components.Add(new PhysicalWeapon());
             creature.components.Add(new LongWeapon());
             creature.components.Add(new PowerStrike());
+            creature.components.Add(new Health(50));
+            creature.components.Add(new Armor(5));
+            return creature;
+        }
+
+        private static Creature GenerateClawer(string name)
+        {
+            var creature = new Creature(name, false);
+            creature.components.Add(new PhysicalWeapon());
+            creature.components.Add(new LongWeapon());
+            creature.components.Add(new Claws());
+            creature.components.Add(new Health(50));
+            creature.components.Add(new Armor(5));
+            return creature;
+        }
+
+        private static Creature GenerateHealer(string name)
+        {
+            var creature = new Creature(name, false);
+            creature.components.Add(new PhysicalWeapon());
+            creature.components.Add(new LongWeapon());
+            creature.components.Add(new HealingWave());
             creature.components.Add(new Health(50));
             creature.components.Add(new Armor(5));
             return creature;

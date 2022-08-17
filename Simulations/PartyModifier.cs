@@ -12,7 +12,6 @@ public class PartyModifier
     public void Start()
     {
         positiveUpgrades = UpgradeStorage.GetPositiveUpgrades();
-        negativeUpgrades = UpgradeStorage.GetNegativeUpgrades();
     }
 
     public Party ModifyPartyDifficulty(Party enemyParty, int upgradePoints)

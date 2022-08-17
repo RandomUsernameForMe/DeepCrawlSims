@@ -9,22 +9,24 @@ namespace DeepCrawlSims
     {
         static void Main(string[] args)
         {
-            Party party = TeamBuilder.CreateAllyTeam();
-            PartySerializer.Serialize(party, "Setups/default");
-
-            party = PartySerializer.Deserialize("Setups/default");
-            Party enemyParty = TeamBuilder.CreateEnemyTeam();
-            BattleManager manager = new BattleManager(party, enemyParty);
-
+            Party allyParty;
+            Party enemyParty;
+            if (true)
+            {
+                allyParty = PartySerializer.Deserialize("Setups/defaultAlly");
+                enemyParty = PartySerializer.Deserialize("Setups/defaultEnemy");
+            }
+            else
+            {
+                allyParty = TeamBuilder.CreateAllyTeam();
+                enemyParty = TeamBuilder.CreateEnemyTeam();
+                PartySerializer.Serialize(allyParty, "Setups/defaultAlly");
+                PartySerializer.Serialize(enemyParty, "Setups/defaultEnemy");
+            }
+            
+            BattleManager manager = new BattleManager(allyParty, enemyParty);
             SimulationsUI sim = new SimulationsUI(manager);
             sim.Run();
-
-            Console.ReadLine();
-
-
-            
-          
-
         }
     }
 }

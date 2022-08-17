@@ -6,7 +6,7 @@ using System.Collections.Generic;
 [Serializable()]
 public class HealingWave : UpgradableComponent
 {
-    public int power;
+    public int power = 20;
     public override Query ProcessQuery(Query action)
     {
         if (action.type == QueryType.AttackBuild)

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 [Serializable()]
 public class Claws : UpgradableComponent
 {
-    public int strength;
+    public int strength = 10;
     public override List<(Type, Type)> GetRequirements()
     {
         var returnValue = new List<(Type, Type)>();

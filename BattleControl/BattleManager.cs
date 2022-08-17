@@ -3,6 +3,7 @@ using DeepCrawlSims.PartyNamespace;
 using DeepCrawlSims.QueryNamespace;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 
@@ -126,28 +127,18 @@ namespace DeepCrawlSims.BattleControl
             var playerCharacters = allyParty.Creatures;
             var enemyCharacters = enemyParty.Creatures;
 
+            var rnd = new Random();
+            var allCharacters = playerCharacters.Concat(enemyCharacters).ToList().OrderBy(item => rnd.Next());
+
             while (!found)
             {
-                // Search for a character with highest speed that havent moved this turn
-                for (int i = 0; i < playerCharacters.Count; i++)
+                foreach (var item in allCharacters)
                 {
-                    var creature = playerCharacters[i];
-                    int speed = creature.GetSpeed();
+                    int speed = item.GetSpeed();
                     if (speed > max_speed)
                     {
                         max_speed = speed;
-                        nextCreature = creature;
-                    }
-                }
-
-                for (int i = 0; i < enemyCharacters.Count; i++)
-                {
-                    var creature = enemyCharacters[i];
-                    int speed = creature.GetSpeed();
-                    if (speed > max_speed)
-                    {
-                        max_speed = speed;
-                        nextCreature = creature;
+                        nextCreature = item;
                     }
                 }
 
