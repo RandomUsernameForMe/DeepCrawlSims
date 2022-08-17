@@ -224,50 +224,49 @@ namespace DeepCrawlSims.Simulations
             bool finished = false;
             while(!finished)
             {
-
-            }
-            Console.Clear();
-            ShowCreatureMenu(creature);
-            List<UpgradeWithCondition> passed = new List<UpgradeWithCondition>();
-            foreach (var item in UpgradeStorage.GetPositiveUpgrades())
-            {
-                item.Condition.creature = creature;
-                if (item.Condition.isPassed())
+                Console.Clear();
+                ShowCreatureMenu(creature);
+                List<UpgradeWithCondition> passed = new List<UpgradeWithCondition>();
+                foreach (var item in UpgradeStorage.GetPositiveUpgrades())
                 {
-                    passed.Add(item);
+                    item.Condition.creature = creature;
+                    if (item.Condition.isPassed())
+                    {
+                        passed.Add(item);
+                    }
                 }
-            }
 
-            Console.WriteLine("What do you want to do now? (enter apropriate number)");
-            int counter = 0;
-            foreach (var item in passed)
-            {
+                Console.WriteLine("What do you want to do now? (enter apropriate number)");
+                int counter = 0;
+                foreach (var item in passed)
+                {
+                    counter++;
+                    Console.WriteLine("{0}:{1} ({2})", counter, item.Upgrade.buttonText, item.Upgrade.descriptionText);
+                }
                 counter++;
-                Console.WriteLine("{0}:{1} ({2})", counter, item.Upgrade.buttonText, item.Upgrade.descriptionText);
-            }
-            counter++;
-            Console.WriteLine("{0}: Go back",counter);
+                Console.WriteLine("{0}: Go back", counter);
 
-            int input = 0;
-            while (input != -1)
-            {
-                input = Console.ReadLine()[0] - '0';
-                if (input < counter && input > 0)
-                {
-                    if (passed[input - 1].TryApplyUpgrade(creature, true, true))
+                int input = 0;
+
+                    input = Console.ReadLine()[0] - '0';
+                    if (input < counter && input > 0)
                     {
-                        Console.WriteLine("Upgrade Succesful!");
+                        if (passed[input - 1].TryApplyUpgrade(creature, true, true))
+                        {
+                            Console.WriteLine("Upgrade Succesful!");
+                        }
+                        else
+                        {
+                            Console.WriteLine("For some reason, upgrade failed.");
+                        }
                     }
-                    else
+                    if (input == counter)
                     {
-                        Console.WriteLine("For some reason, upgrade failed.");
+                        finished = true;
                     }
-                }
-                if (input == counter)
-                {
-                    input = -1;
-                }                
-            }            
+                
+            }
+            
         }
     }
 }
