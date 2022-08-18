@@ -18,10 +18,5 @@ namespace DeepCrawlSims.PartyNamespace.Components.Upgrades
             }
             return false;
         }
-
-        public Type GetGenericType()
-        {
-            return typeof(T);
-        }
     }
 }

@@ -41,13 +41,18 @@ public class Armor : UpgradableComponent
 
     public override bool TryUpgrade(bool positive)
     {
-        if (armor <= 3)
-        {
-            //Destroy(this);
-            return true;
-        }
+
         if (positive) armor += 3;
-        else armor -= 3;
+        else
+        {
+            if (armor <= 3)
+            {
+                //Destroy(this);
+                return true;
+            }
+            armor -= 3;
+        }
+        
         return true;
     }
 }

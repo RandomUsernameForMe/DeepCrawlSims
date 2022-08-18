@@ -34,9 +34,13 @@ public class Speed : UpgradableComponent
 
     public override bool TryUpgrade(bool positive)
     {
-        if (speed == 1) return false;
+
         if (positive) speed += 1;
-        else speed -= 1;
+        else
+        {
+            speed -= 1;
+            if (speed == 1) return false;
+        }
         return true;
     }
 

@@ -50,6 +50,7 @@ namespace DeepCrawlSims
             creature.components.Add(new PowerStrike());
             creature.components.Add(new Health(50));
             creature.components.Add(new Armor(5));
+            creature.components.Add(new Speed(2));
             return creature;
         }
 
@@ -61,6 +62,7 @@ namespace DeepCrawlSims
             creature.components.Add(new Claws());
             creature.components.Add(new Health(50));
             creature.components.Add(new Armor(5));
+            creature.components.Add(new Speed(2));
             return creature;
         }
 
@@ -72,6 +74,7 @@ namespace DeepCrawlSims
             creature.components.Add(new HealingWave());
             creature.components.Add(new Health(50));
             creature.components.Add(new Armor(5));
+            creature.components.Add(new Speed(3));
             return creature;
         }
     }
