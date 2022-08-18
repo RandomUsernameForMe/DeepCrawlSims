@@ -246,9 +246,9 @@ namespace DeepCrawlSims.Simulations
                 counter++;
                 Console.WriteLine("{0}: Go back", counter);
 
-                int input = 0;
 
-                    input = Console.ReadLine()[0] - '0';
+
+                    int input = Console.ReadLine()[0] - '0';
                     if (input < counter && input > 0)
                     {
                         if (passed[input - 1].TryApplyUpgrade(creature, true, true))
