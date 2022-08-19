@@ -35,8 +35,8 @@ public class UpgradeWithCondition
         return Condition.isPassed();
     }
 
-    public bool TryApplyUpgrade(Creature creature, bool positive, bool unlimitedSpace)
+    public void ApplyUpgrade(Creature creature, bool positive, bool unlimitedSpace)
     {
-        return Upgrade.TryUpgrade(creature,positive,unlimitedSpace);
+        Upgrade.UpgradeOrAdd(creature,positive,unlimitedSpace);
     }
 }

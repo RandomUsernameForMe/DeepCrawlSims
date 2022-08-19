@@ -40,13 +40,12 @@ public class ElementalResistance : UpgradableComponent
 
     public override bool TryUpgrade(bool positive)
     {
-        if (resistance <= 0.2)
-        {
-            //Destroy(this);
-            return true;
-        }
         if (positive) resistance += 0.2;
-        else resistance -= 0.2;
+        else
+        {
+            if (resistance <= 0.2) return false;
+            resistance -= 0.2;
+        }
         return true;
     }
 }

@@ -14,6 +14,12 @@ public class Speed : UpgradableComponent
         return null;
     }
 
+    public Speed()
+    {
+        speed = 2;
+        maxSpeed = 2;
+    }
+
     public Speed(int speed)
     {
         this.speed = speed;
@@ -35,10 +41,15 @@ public class Speed : UpgradableComponent
     public override bool TryUpgrade(bool positive)
     {
 
-        if (positive) speed += 1;
+        if (positive)
+        {
+            speed += 1;
+            maxSpeed += 1;
+        }
         else
         {
             speed -= 1;
+            maxSpeed -= 1;
             if (speed == 1) return false;
         }
         return true;

@@ -4,19 +4,23 @@ using System.Text;
 
 namespace DeepCrawlSims.PartyNamespace.Components.Upgrades
 {
-    class ComponentUpgrade<T> : Upgrade where T : UpgradableComponent
+    class ComponentUpgrade<T> : Upgrade where T : UpgradableComponent, new()
     {
-        public override bool TryUpgrade(Creature creature, bool positive, bool unlimitedSpace) //TODO
+        public override void UpgradeOrAdd(Creature creature, bool positive, bool unlimitedSpace) 
         {
+            bool found = false;
             foreach (var item in creature.components)
             {
                 if (item is T)
                 {
                     (item as UpgradableComponent).TryUpgrade(true);
-                    return true;
+                    found = true; ;
                 }
             }
-            return false;
+            if (!found)
+            {
+                creature.components.Add(new T());
+            }            
         }
     }
 }

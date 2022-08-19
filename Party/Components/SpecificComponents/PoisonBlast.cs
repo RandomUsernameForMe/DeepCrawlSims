@@ -54,7 +54,6 @@ public class PoisonBlast: UpgradableComponent
         switch (newlvl)
         {
             case 0:
-                //Destroy(this);
                 return true;
             case 1:
                 duration = 2;

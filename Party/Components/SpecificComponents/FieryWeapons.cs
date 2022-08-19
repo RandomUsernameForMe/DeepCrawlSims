@@ -46,11 +46,7 @@ public class FieryWeapons : UpgradableComponent
 
     public override bool TryUpgrade(bool positive)
     {
-        if (power <= 5)
-        {
-            //Destroy(this);
-            return true;
-        }
+
         if (positive) power += 5;
         else power -= 5;
         return true;

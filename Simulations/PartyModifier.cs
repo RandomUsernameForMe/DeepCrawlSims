@@ -6,19 +6,18 @@ using System.Collections.Generic;
 public class PartyModifier
 {
 
-    List<UpgradeWithCondition> positiveUpgrades;
-    List<UpgradeWithCondition> negativeUpgrades;
+    List<UpgradeWithCondition> upgrades;
 
     public void Start()
     {
-        positiveUpgrades = UpgradeStorage.GetPositiveUpgrades();
+        upgrades = UpgradeStorage.GetPositiveUpgrades();
     }
 
     public Party ModifyPartyDifficulty(Party enemyParty, int upgradePoints)
     {
         bool makeEnemiesHarder = true;
-        if (upgradePoints ==0) return enemyParty;
-        if (upgradePoints <0 )
+        if (upgradePoints == 0) return enemyParty;
+        if (upgradePoints < 0)
         {
             upgradePoints = -upgradePoints;
             makeEnemiesHarder = false;
@@ -27,38 +26,36 @@ public class PartyModifier
         {
             var rnd = new Random();
             int rndInt = rnd.Next(0, 4);
-            ChangeDifficultyForCreature(enemyParty.Creatures[rndInt], makeEnemiesHarder,ref upgradePoints);
+            ChangeDifficultyForCreature(enemyParty.Creatures[rndInt], makeEnemiesHarder, ref upgradePoints);
         }
         return enemyParty;
     }
 
-    private void ChangeDifficultyForCreature(Creature creature, bool makeEnemiesHarder,ref int points)
+    private void ChangeDifficultyForCreature(Creature creature, bool makeEnemiesHarder, ref int points)
     {
         List<UpgradeWithCondition> possibleUpgrades;
         if (makeEnemiesHarder)
         {
-            possibleUpgrades = positiveUpgrades.FindAll(x => x.IsConditionPassed(creature));
+            possibleUpgrades = upgrades.FindAll(x => x.IsConditionPassed(creature));
         }
-        else {
-            possibleUpgrades = negativeUpgrades.FindAll(x => x.IsConditionPassed(creature));
+        else
+        {
+            possibleUpgrades = null; //TODO;
         }
         if (possibleUpgrades.Count == 0) throw new Exception();
-        for (int i = 0; i < possibleUpgrades.Count*2; i++)
+        for (int i = 0; i < possibleUpgrades.Count * 2; i++)
         {
             var rnd = new Random();
             int rndInt = rnd.Next(0, possibleUpgrades.Count);
 
-            var upgradeSuccesful = possibleUpgrades[rndInt].TryApplyUpgrade(creature, makeEnemiesHarder,false);
-            if (upgradeSuccesful)
-            {
-                points -= possibleUpgrades[rndInt].Upgrade.cost;
-                return;
-            }
+            possibleUpgrades[rndInt].ApplyUpgrade(creature, makeEnemiesHarder, false);
+            points -= possibleUpgrades[rndInt].Upgrade.cost;
+            return;
         }
         points--;
         return;
-        
+
     }
 
-   
+
 }

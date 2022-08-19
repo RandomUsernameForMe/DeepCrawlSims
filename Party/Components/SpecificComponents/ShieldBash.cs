@@ -55,8 +55,7 @@ public class ShieldBash : UpgradableComponent
 
         switch (newlvl) {
             case 0:
-                //Destroy(this);
-                return true;
+                return false;
             case 1:
                 stunDuration = 1;
                 bashDmg = 10;

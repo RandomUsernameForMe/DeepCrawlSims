@@ -6,12 +6,18 @@ using System.Collections.Generic;
 [Serializable()]
 public class Health : UpgradableComponent
 {
-    public double health = 50;
-    public int maxHealth = 50;
+    public double health;
+    public int maxHealth;
 
     public Health(int health) {
         this.health = health;
         maxHealth = health;
+    }
+
+    public Health()
+    {
+        health = 50;
+        maxHealth = 50;
     }
 
     override public Query ProcessQuery(Query query)

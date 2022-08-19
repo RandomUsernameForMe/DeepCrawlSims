@@ -44,13 +44,16 @@ public class PowerStrike : UpgradableComponent
 
     public override bool TryUpgrade(bool positive)
     {
-        if (power <= 20)
-        {
-            //Destroy(this);
-            return true;
-        }
+
         if (positive) power += 10;
-        else power -= 10;
+        else
+        {
+            power -= 10;
+            if (power <= 10)
+            {
+                return true;
+            }
+        }
         return true;
     }
 }

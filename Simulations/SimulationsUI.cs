@@ -141,16 +141,22 @@ namespace DeepCrawlSims.Simulations
 
             Console.WriteLine("What name do you want to save your party as?");
             Console.WriteLine("Available saved parties:");
-            List<string> files = (List<string>) Directory.EnumerateFiles("Setups", "*");
+            var files = Directory.EnumerateFiles("Setups", "*");
             foreach (string file in files)
             {
-                Console.WriteLine(file);
+                
+                Console.WriteLine(file.Remove(0, 7));
             }
             string filename = "";
             while (filename == "")
             {
-                filename = Console.ReadLine();
-                if (!files.Contains(filename))
+                filename = "Setups\\"+ Console.ReadLine();
+                bool found = false;
+                foreach (var item in files)
+                {
+                    if (item == filename) found = true; 
+                }
+                if (!found)
                 {
                     Console.WriteLine("Choose a different name, ya smartass.");
                     filename = "";
@@ -175,12 +181,16 @@ namespace DeepCrawlSims.Simulations
             while (partyPick == "")
             {
                 partyPick = Console.ReadLine();
-                if (partyPick != "ally" || partyPick != "enemy")
+                if (partyPick != "ally" && partyPick != "enemy")
                 {
                     Console.WriteLine("Wrong input!");
                     partyPick = "";
                 }
-                Console.WriteLine("Succesfully saved.");
+                else
+                {
+                    Console.WriteLine("Succesfully saved.");
+                }
+                
             }
 
             Console.WriteLine("What name do you want to save your party as?");
@@ -251,14 +261,9 @@ namespace DeepCrawlSims.Simulations
                     int input = Console.ReadLine()[0] - '0';
                     if (input < counter && input > 0)
                     {
-                        if (passed[input - 1].TryApplyUpgrade(creature, true, true))
-                        {
-                            Console.WriteLine("Upgrade Succesful!");
-                        }
-                        else
-                        {
-                            Console.WriteLine("For some reason, upgrade failed.");
-                        }
+                        passed[input - 1].ApplyUpgrade(creature, true, true);
+                        Console.WriteLine("Upgrade Succesful!");
+                        
                     }
                     if (input == counter)
                     {

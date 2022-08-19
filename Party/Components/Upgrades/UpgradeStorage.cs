@@ -5,13 +5,12 @@ using System.Collections.Generic;
 
 public class UpgradeStorage
 {
-    static List<UpgradeWithCondition> positive;
-    static List<UpgradeWithCondition> negative;
+    static List<UpgradeWithCondition> stored;
 
     public static List<UpgradeWithCondition> GetPositiveUpgrades()
     {
 
-        if (positive == null)
+        if (stored == null)
         {
             var positiveUpgrades = new List<UpgradeWithCondition>();
             positiveUpgrades.Add(new UpgradeWithCondition(
@@ -76,8 +75,8 @@ public class UpgradeStorage
                 "Get quicker",
                 "Add +1 to your speed, making you play earlier."));
 
-            positive = positiveUpgrades;
+            stored = positiveUpgrades;
         }
-        return positive;
+        return stored;
     }
 }

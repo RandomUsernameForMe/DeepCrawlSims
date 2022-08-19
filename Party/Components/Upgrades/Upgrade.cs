@@ -14,5 +14,5 @@ public abstract class Upgrade : IComparable
         return buttonText.ToString().CompareTo(obj.ToString());
     }
 
-    abstract public bool TryUpgrade(Creature creature, bool positive,bool unlimitedSpace);
+    abstract public void UpgradeOrAdd(Creature creature, bool positive,bool unlimitedSpace);
 }
