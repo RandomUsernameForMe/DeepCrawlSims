@@ -165,11 +165,19 @@ namespace DeepCrawlSims.Simulations
 
             if (partyPick == "ally")
             {
-                manager.allyParty = PartySerializer.Deserialize(String.Format("Setups/{0}",filename));
+                manager.allyParty = PartySerializer.Deserialize(String.Format("{0}",filename));
+                foreach (var item in manager.enemyParty.Creatures)
+                {
+                    item.isEnemy = false;
+                }
             }
             else
             {
-                manager.enemyParty = PartySerializer.Deserialize(String.Format("Setups/{0}", filename));
+                manager.enemyParty = PartySerializer.Deserialize(String.Format("{0}", filename));
+                foreach (var item in manager.enemyParty.Creatures)
+                {
+                    item.isEnemy = true;
+                }
             }
             Console.WriteLine("Succesfully loaded.");
         }

@@ -109,7 +109,6 @@ public class SimulationRunner
         int wins = results.Where(x => x.result.Equals(1)).Count();
         int loses = results.Where(x => x.result.Equals(2)).Count();
         float winrate = 100 * ((float)wins / (wins + loses));
-        //Debug.Log(String.Format("Winrate: {0}", winrate));
         return (Math.Abs(targetWinrate - winrate) < winrateTolerance);
     }
 
