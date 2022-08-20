@@ -85,6 +85,15 @@ namespace DeepCrawlSims.PartyNamespace
                 HPs[0], HPs[1], HPs[2], HPs[3],
                names[0], names[1], names[2], names[3]);
         }
+
+        internal Party MakeHostile(bool v)
+        {
+            foreach (var item in creatures)
+            {
+                item.isEnemy = v;
+            }
+            return this;
+        }
     }
 
 }

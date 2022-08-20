@@ -13,7 +13,7 @@ namespace DeepCrawlSims
             Party enemyParty;
 
             allyParty = TeamBuilder.CreateAllyTeam();
-            enemyParty = TeamBuilder.CreateEnemyTeam();
+            enemyParty = TeamBuilder.CreateEnemyTeam().MakeHostile(true);
             PartySerializer.Serialize(allyParty, "Setups/defaultAlly");
             PartySerializer.Serialize(enemyParty, "Setups/defaultEnemy");
 
