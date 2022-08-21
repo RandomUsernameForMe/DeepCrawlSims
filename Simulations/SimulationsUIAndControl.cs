@@ -8,7 +8,10 @@ using System.Text;
 
 namespace DeepCrawlSims.Simulations
 {
-    class SimulationsUI
+    /// <summary>
+    /// All the UI user interacts with using the program. Its a pseudostate machine switching between states of the menu 
+    /// </summary>
+    class SimulationsUIAndControl
     {
         const int RUN_CONST = 2;
         const int MENU_CONST = 1;
@@ -18,12 +21,12 @@ namespace DeepCrawlSims.Simulations
         SimulationRunner simRunner;
         int command = MENU_CONST;
 
-        public SimulationsUI(BattleManager battleManager)
+        public SimulationsUIAndControl(BattleManager battleManager)
         {
             manager = battleManager;
         }
 
-        public void Run()
+        public void RunUI()
         {
             simRunner = new SimulationRunner(manager, 1000);
             while (command != 0)
@@ -48,6 +51,9 @@ namespace DeepCrawlSims.Simulations
             }
         }
 
+        /// <summary>
+        /// Menu showing all creatures in a party and giving the option to pick one to modify.
+        /// </summary>
         public void ShowPartyMenu(Party party)
         {
             bool finished = false;
@@ -55,7 +61,7 @@ namespace DeepCrawlSims.Simulations
                 Console.Clear();
                 foreach (var creature in party.Creatures)
                 {
-                    ShowCreatureMenu(creature);
+                    ShowCreature(creature);
                 }
 
                 Console.WriteLine("What do you want to do now? (enter apropriate number)");
@@ -76,7 +82,11 @@ namespace DeepCrawlSims.Simulations
             }
         }
 
-        public void ShowCreatureMenu(Creature creature)
+        /// <summary>
+        /// UI item describing components of one creature
+        /// </summary>
+        /// <param name="creature"></param>
+        public void ShowCreature(Creature creature)
         {
             Console.WriteLine("Name: {0}", creature.name);
             Query query = new Query(QueryType.Description);
@@ -85,6 +95,10 @@ namespace DeepCrawlSims.Simulations
             Console.WriteLine(description);
             Console.WriteLine();
         }
+
+        /// <summary>
+        /// Main menu, main branching state for user controling the program  
+        /// </summary>
         public void ShowMainMenu()
         {
             Console.Clear();
@@ -125,6 +139,9 @@ namespace DeepCrawlSims.Simulations
             }
         }
 
+        /// <summary>
+        /// Sub-menu for when user wants to load party setup from a file.
+        /// </summary>
         private void LoadPartyMenu(BattleManager manager)
         {
             Console.WriteLine("Do you want to load ally or enemy party? (ally/enemy)");
@@ -168,7 +185,7 @@ namespace DeepCrawlSims.Simulations
                 manager.allyParty = PartySerializer.Deserialize(String.Format("{0}",filename));
                 foreach (var item in manager.enemyParty.Creatures)
                 {
-                    item.isEnemy = false;
+                    item.isOppositeSide = false;
                 }
             }
             else
@@ -176,12 +193,15 @@ namespace DeepCrawlSims.Simulations
                 manager.enemyParty = PartySerializer.Deserialize(String.Format("{0}", filename));
                 foreach (var item in manager.enemyParty.Creatures)
                 {
-                    item.isEnemy = true;
+                    item.isOppositeSide = true;
                 }
             }
             Console.WriteLine("Succesfully loaded.");
         }
 
+        /// <summary>
+        /// Sub-menu for when user wants to save party setup into a file
+        /// </summary>
         private void SavePartyMenu(BattleManager manager)
         {
             Console.WriteLine("Do you want to save ally or enemy party? (ally/enemy)");
@@ -197,8 +217,7 @@ namespace DeepCrawlSims.Simulations
                 else
                 {
                     Console.WriteLine("Succesfully saved.");
-                }
-                
+                }                
             }
 
             Console.WriteLine("What name do you want to save your party as?");
@@ -220,6 +239,10 @@ namespace DeepCrawlSims.Simulations
             PartySerializer.Serialize(party, String.Format("Setups/{0}",filename));
 
         }
+        
+        /// <summary>
+        /// Sub-menu for when user wants to change the number of simulations ran
+        /// </summary>
         private void ChangeSimulationsCountMenu(SimulationRunner simRunner)
         {
             Console.WriteLine("How many simulated combats do you want to run per session?");
@@ -237,13 +260,18 @@ namespace DeepCrawlSims.Simulations
             Console.WriteLine("Succesfully changed.");
             simRunner.simCount = simCount;
         }
+
+        /// <summary>
+        /// Show menu for modifications for a specific creature
+        /// </summary>
+        /// <param name="creature">creature to be modified</param>
         public void ShowUpgradesMenu(Creature creature)
         {
             bool finished = false;
             while(!finished)
             {
                 Console.Clear();
-                ShowCreatureMenu(creature);
+                ShowCreature(creature);
                 List<UpgradeWithCondition> passed = new List<UpgradeWithCondition>();
                 foreach (var item in UpgradeStorage.GetPositiveUpgrades())
                 {

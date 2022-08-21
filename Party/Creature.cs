@@ -17,13 +17,13 @@ namespace DeepCrawlSims.PartyNamespace
     {
         public string name;
         public Controller controller;
-        public bool isEnemy;
+        public bool isOppositeSide;
         public List<Component> components;
 
         public Creature(string name, bool isEnemy)
         {
             this.name = name;            
-            this.isEnemy = isEnemy;
+            this.isOppositeSide = isEnemy;
             controller = new Controller();
             components = new List<Component>();
         }
@@ -31,7 +31,7 @@ namespace DeepCrawlSims.PartyNamespace
         public Creature()
         {
             this.name = "defaultName";
-            this.isEnemy = false;
+            this.isOppositeSide = false;
             controller = new Controller();
             components = new List<Component>();
         }

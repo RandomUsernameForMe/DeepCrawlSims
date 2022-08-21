@@ -83,7 +83,7 @@ namespace DeepCrawlSims.AI
                 query.Add(QueryParameter.Basic, 0);
                 query = creature.ProcessQuery(query);
                 List<QueryParameter> keys = new List<QueryParameter>(query.parameters.Keys);
-                List<int> pos = TargetingSystem.PickViableTargets(keys, creature.isEnemy);
+                List<int> pos = TargetingSystem.PickViableTargets(keys, creature.isOppositeSide);
 
                 TryAllPossibleTargets(query, pos, results, 0);
 
@@ -91,7 +91,7 @@ namespace DeepCrawlSims.AI
                 query.Add(QueryParameter.Special, 0);
                 query = creature.ProcessQuery(query);
                 keys = new List<QueryParameter>(query.parameters.Keys);
-                pos = TargetingSystem.PickViableTargets(keys, creature.isEnemy);
+                pos = TargetingSystem.PickViableTargets(keys, creature.isOppositeSide);
 
                 TryAllPossibleTargets(query, pos, results, 1);
 
@@ -126,7 +126,7 @@ namespace DeepCrawlSims.AI
         private bool ActionHasViableTargets(Query query, Creature creature)
         {
             List<QueryParameter> keys = new List<QueryParameter>(query.parameters.Keys);
-            List<int> pos = TargetingSystem.PickViableTargets(keys, creature.isEnemy);
+            List<int> pos = TargetingSystem.PickViableTargets(keys, creature.isOppositeSide);
 
             bool viableTargetFound = false;
 
@@ -141,7 +141,7 @@ namespace DeepCrawlSims.AI
         public Creature PickRandomTarget(Query query, Creature creature)
         {
             List<QueryParameter> keys = new List<QueryParameter>(query.parameters.Keys);
-            List<int> pos = TargetingSystem.PickViableTargets(keys, creature.isEnemy);
+            List<int> pos = TargetingSystem.PickViableTargets(keys, creature.isOppositeSide);
             var targetFound = false;
             Creature cre = null;
 

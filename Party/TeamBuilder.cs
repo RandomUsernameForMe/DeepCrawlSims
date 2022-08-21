@@ -6,26 +6,26 @@ namespace DeepCrawlSims
     internal class TeamBuilder
     {
 
-        internal static Party CreateEnemyTeam()
+        internal static Party CreateTeamTwo()
         {
             var party = new Party();
             party.Creatures.Add(GeneratePoisonMage("Mage1"));
             party.Creatures.Add(GenerateFighter("Fighter1"));
             party.Creatures.Add(GenerateClawer("Clawer1"));
             party.Creatures.Add(GenerateClawer("Clawer2"));
-            foreach (var item in party.Creatures) { item.isEnemy = false; }
+            foreach (var item in party.Creatures) { item.isOppositeSide = false; }
 
             return party;
         }
 
-        internal static Party CreateAllyTeam()
+        internal static Party CreateTeamOne()
         {
             var party = new Party();
             party.Creatures.Add(GeneratePoisonMage("Mage1"));
             party.Creatures.Add(GenerateHealer("Healer1"));
             party.Creatures.Add(GenerateFighter("Fighter1"));
             party.Creatures.Add(GenerateFighter("Fighter2"));
-            foreach (var item in party.Creatures) { item.isEnemy = false; }
+            foreach (var item in party.Creatures) { item.isOppositeSide = false; }
 
             return party;
         }

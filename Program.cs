@@ -9,17 +9,14 @@ namespace DeepCrawlSims
     {
         static void Main(string[] args)
         {
-            Party allyParty;
-            Party enemyParty;
-
-            allyParty = TeamBuilder.CreateAllyTeam();
-            enemyParty = TeamBuilder.CreateEnemyTeam().MakeHostile(true);
+            var allyParty = TeamBuilder.CreateTeamOne();
+            var enemyParty = TeamBuilder.CreateTeamTwo().MakeOppositeSide(true);
             PartySerializer.Serialize(allyParty, "Setups/defaultAlly");
             PartySerializer.Serialize(enemyParty, "Setups/defaultEnemy");
 
-            BattleManager manager = new BattleManager(allyParty, enemyParty);
-            SimulationsUI sim = new SimulationsUI(manager);
-            sim.Run();
+            var manager = new BattleManager(allyParty, enemyParty);
+            var controller = new SimulationsUIAndControl(manager);
+            controller.RunUI();
         }
     }
 }

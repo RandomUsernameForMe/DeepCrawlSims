@@ -11,25 +11,36 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.Json;
 using System.Threading.Tasks;
 
+
+/// <summary>
+/// Simulationrunner is the main handler of performing simulations of combat encounters.
+/// </summary>
 public class SimulationRunner
 {
     public BattleManager manager;
-    public Controller AIControl;
     public int simCount = 100;
-    public float targetWinrate;
-    public float winrateTolerance;
     public bool finished = false;
+
+    public SimulationRunner(BattleManager manager, int simCount)
+    {
+        this.manager = manager;
+        this.simCount = simCount;
+    }
 
     internal async void Run()
     {
         var watch = System.Diagnostics.Stopwatch.StartNew();
         var results = new List<BattleResults>();
+
+        // We create a new thread for every 100 simulated battles. The count is arbitrarily chosen.
         for (int i = 0; i < simCount; i+=100)
         {
             var result = await Task.Run(() => RunBattles(manager,100));            
             results.AddRange(result);                     
         }
-        ShowResults(results);
+
+        // Show output after simulations have finished
+        ShowResultsSummary(results);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
         Console.WriteLine($"Press Any Key to continue");
@@ -39,6 +50,8 @@ public class SimulationRunner
 
     private List<BattleResults> RunBattles(BattleManager manager,int battleCount)
     {
+        // Due to using multiple threads to perform simulations, we require hard copies of BattleManager
+        // (De)serialization is a way to make such copy
         var b = new BinaryFormatter();
         var ms = new MemoryStream();
         b.Serialize(ms, manager);
@@ -48,7 +61,7 @@ public class SimulationRunner
         var results = new List<BattleResults>();
         for (int i = 0; i < battleCount; i++)
         {
-            while (newManager.running == true)
+            while (newManager.isRunning == true)
             {
                 newManager.RunOneTurn();
             }
@@ -56,68 +69,19 @@ public class SimulationRunner
             newManager.Reset();
         }        
         return results;
-
     } 
 
-    public SimulationRunner(BattleManager manager, int simCount)
-    {
-        this.manager = manager;
-        this.simCount = simCount;
-    }
-
-    public void ShowResults(List<BattleResults> results)
+    
+    /// <summary>
+    /// Writes to console a summary of results after all desired simulations have finished
+    /// </summary>
+    public void ShowResultsSummary(List<BattleResults> results)
     {
         var gamesPlayed = results.Count;
-
         int wins = results.Where(x => x.result.Equals(1)).Count();
         int loses = results.Where(x => x.result.Equals(2)).Count();
         float winrate = 100*((float)wins / gamesPlayed);
         Console.WriteLine(String.Format("Played Games: {0} , Winrate: {1} %", gamesPlayed, winrate));
-    }
-
-    public IEnumerator StartSimulationCoroutine()
-    {
-        bool finished = false;
-        while(!finished)
-        {
-            var results = new List<BattleResults>();
-            for (int i = 0; i < simCount; i++)
-            {
-                while (manager.running == true)
-                {
-                    manager.RunOneTurn();
-                }
-                results.Add(manager.results);
-
-                //ShowResults(results); Not needed
-                manager.Reset();
-                yield return null;
-            }
-            finished = AreSimulationsSatisfied(results);
-            if (!finished)
-            {
-                var points = CalculateUpgradePoints(results);
-                
-                //manager.enemyParty = modifier.ModifyPartyDifficulty(manager.enemyParty, points);
-                manager.Reset();                
-            }
-        }        
-    }
-
-    private bool AreSimulationsSatisfied(List<BattleResults> results)
-    {
-        int wins = results.Where(x => x.result.Equals(1)).Count();
-        int loses = results.Where(x => x.result.Equals(2)).Count();
-        float winrate = 100 * ((float)wins / (wins + loses));
-        return (Math.Abs(targetWinrate - winrate) < winrateTolerance);
-    }
-
-    public int CalculateUpgradePoints(List<BattleResults> results)
-    {
-        int wins = results.Where(x => x.result.Equals(1)).Count();
-        int loses = results.Where(x => x.result.Equals(2)).Count();
-        float winrate = 100 * ((float)wins / (wins + loses));
-        return (int) (winrate-targetWinrate)/3; //změnit počet bodů zde
     }
 }
 

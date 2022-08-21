@@ -33,7 +33,7 @@ namespace DeepCrawlSims.BattleControl
         public Party enemyParty;
         public Creature currentCreature;
         private Controller controller; 
-        public bool running = true;
+        public bool isRunning = true;
         public BattleResults results;
         private int skipCounter;
         private bool artificialEnd = false;
@@ -46,7 +46,7 @@ namespace DeepCrawlSims.BattleControl
             this.enemyParty = enemyParty;
             controller = new Controller();
             controller.manager = this;
-            running = true;
+            isRunning = true;
         }
 
 
@@ -55,7 +55,7 @@ namespace DeepCrawlSims.BattleControl
             if (IsGameOver() || artificialEnd)
             {
                 results = GenerateBattleResults();
-                running = false;
+                isRunning = false;
                 skipCounter = 0;
                 artificialEnd = false;
 
@@ -71,7 +71,7 @@ namespace DeepCrawlSims.BattleControl
         {            
             enemyParty.FullReset();
             allyParty.FullReset();
-            running = true;
+            isRunning = true;
         }
 
         public void CurrentCreatureSkips()
