@@ -13,7 +13,7 @@ namespace DeepCrawlSims
             party.Creatures.Add(GenerateFighter("Fighter1"));
             party.Creatures.Add(GenerateClawer("Clawer1"));
             party.Creatures.Add(GenerateClawer("Clawer2"));
-            foreach (var item in party.Creatures) { item.isOppositeSide = false; }
+            foreach (var item in party.Creatures) { item.isOnOpposingSide = false; }
 
             return party;
         }
@@ -25,7 +25,7 @@ namespace DeepCrawlSims
             party.Creatures.Add(GenerateHealer("Healer1"));
             party.Creatures.Add(GenerateFighter("Fighter1"));
             party.Creatures.Add(GenerateFighter("Fighter2"));
-            foreach (var item in party.Creatures) { item.isOppositeSide = false; }
+            foreach (var item in party.Creatures) { item.isOnOpposingSide = false; }
 
             return party;
         }

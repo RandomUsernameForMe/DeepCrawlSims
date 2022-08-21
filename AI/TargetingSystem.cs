@@ -13,7 +13,7 @@ namespace DeepCrawlSims.AI
         /// <param name="pos">Grid coordinates plus a bool if ally or enemy side</param>
         /// <param name="casterIsEnemy">If the one asking is enemy or frieds</param>
         /// <returns></returns>
-        public static List<int> PickViableTargets(List<QueryParameter> pos, bool casterIsEnemy)
+        public static List<int> ListViableTargets(List<QueryParameter> pos, bool casterIsEnemy)
         {
             List<int> list = new List<int> { 0, 1, 2, 3, 4, 5, 6, 7 };
             foreach (var item in pos)

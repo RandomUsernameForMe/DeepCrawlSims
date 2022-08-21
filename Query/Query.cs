@@ -7,12 +7,9 @@ namespace DeepCrawlSims.QueryNamespace
     {
         Attack,
         Description,
-        AttackBuild,
-        Render,
-        Animation,
+        AttackBuilder,
         Question,
         Tick,
-        Swap,
         None,
     }
     public enum QueryParameter

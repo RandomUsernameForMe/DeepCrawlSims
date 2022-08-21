@@ -12,19 +12,22 @@ namespace DeepCrawlSims.AI
     public class Controller
     {
         public BattleManager manager;
+        static int BASIC_ATTACK_CONSTANT = 0;
+        static int SPECIAL_CONSTANT = 1;
 
         /// <summary>
-        /// General function to handle everything when computer wants to decide what to play
+        /// General function to handle everything when controller wants to decide what to play
         /// </summary>
         /// <param name="creature"></param>
         public void CreatureActs(Creature creature)
         {
-            // theres now a 250% chance of a calculated attack
+            // theres now a 50% chance of a calculated attack
             Random rnd = new Random();
             int rndInt = rnd.Next(0, 2);
             Query query = null; ;
             Creature target = null; ;
 
+            // when picking a calculated action
             if (rndInt == 1)
             {
                 // Choose attack 
@@ -38,8 +41,8 @@ namespace DeepCrawlSims.AI
                 else
                 {
                     // Prepare attack 
-                    query = new Query(QueryType.AttackBuild);
-                    if (t.Item1 == 0) query.Add(QueryParameter.Basic, 0);
+                    query = new Query(QueryType.AttackBuilder);
+                    if (t.Item1 == BASIC_ATTACK_CONSTANT) query.Add(QueryParameter.Basic, 0);
                     else query.Add(QueryParameter.Special, 0);
                     query = creature.ProcessQuery(query);
 
@@ -47,68 +50,71 @@ namespace DeepCrawlSims.AI
                     target = TargetingSystem.GetCreatureByPosition(t.Item2, manager);
                 }
             }
+
+            // when picking a random action
             else
             {
                 var found = false;
                 for (int i = 0; i < 3; i++)
                 {
                     if (!found)
-                    {                        
-                        rndInt = rnd.Next(0, 2);                        
-                        query = new Query(QueryType.AttackBuild);
-                        if (rndInt == 0) query.Add(QueryParameter.Basic, 0);
+                    {
+                        rndInt = rnd.Next(0, 2);
+                        query = new Query(QueryType.AttackBuilder);
+                        if (rndInt == BASIC_ATTACK_CONSTANT) query.Add(QueryParameter.Basic, 0);
                         else query.Add(QueryParameter.Special, 0);
                         query = creature.ProcessQuery(query);
-                        found = ActionHasViableTargets(query, creature);
+                        found = DoesActionHaveViableTargets(query, creature);
                     }
                 }
-
                 if (found) target = PickRandomTarget(query, creature);
                 else query.type = QueryType.None;
             }
             manager.CurrentCreaturePlays(target, query);
         }
 
-
+        /// <summary>
+        /// Picks the action and target amounting to the maximum possible damage done
+        /// </summary>
+        /// <param name="creature"></param>
+        /// <returns>tuple, first int describing type of attack, second int number of targeted creature</returns>
         public (int, int) PickActionToPlay(Creature creature)
         {
             Query query;
+            var results = new Dictionary<(int, int), double>();
 
-            var betterAI = true;
-            if (betterAI)
+            // Calculate damage a basic attack would do to its possible targets
+
+            query = new Query(QueryType.AttackBuilder);
+            query.Add(QueryParameter.Basic, 0);
+            query = creature.ProcessQuery(query);
+            List<QueryParameter> keys = new List<QueryParameter>(query.parameters.Keys);
+            List<int> pos = TargetingSystem.ListViableTargets(keys, creature.isOnOpposingSide);
+            TryAllPossibleTargets(query, pos, results, BASIC_ATTACK_CONSTANT);
+
+            // Calculate damage a special ability would do to its possible targets
+            // (Works with heling, but doesnt calculate poison damage) 
+
+            query = new Query(QueryType.AttackBuilder);
+            query.Add(QueryParameter.Special, 0);
+            query = creature.ProcessQuery(query);
+            keys = new List<QueryParameter>(query.parameters.Keys);
+            pos = TargetingSystem.ListViableTargets(keys, creature.isOnOpposingSide);
+            TryAllPossibleTargets(query, pos, results, SPECIAL_CONSTANT);
+
+            // pick the ability that doesnt the most possible damage
+
+            double max = 0;
+            (int, int) maxItem = (-1, -1);
+            foreach (var item in results.Keys)
             {
-                var results = new Dictionary<(int, int), double>();
-
-                query = new Query(QueryType.AttackBuild);
-                query.Add(QueryParameter.Basic, 0);
-                query = creature.ProcessQuery(query);
-                List<QueryParameter> keys = new List<QueryParameter>(query.parameters.Keys);
-                List<int> pos = TargetingSystem.PickViableTargets(keys, creature.isOppositeSide);
-
-                TryAllPossibleTargets(query, pos, results, 0);
-
-                query = new Query(QueryType.AttackBuild);
-                query.Add(QueryParameter.Special, 0);
-                query = creature.ProcessQuery(query);
-                keys = new List<QueryParameter>(query.parameters.Keys);
-                pos = TargetingSystem.PickViableTargets(keys, creature.isOppositeSide);
-
-                TryAllPossibleTargets(query, pos, results, 1);
-
-                double max = 0;
-                (int, int) maxItem = (-1, -1);
-                foreach (var item in results.Keys)
+                if (results[item] > max && !TargetingSystem.GetCreatureByPosition(item.Item2, manager).Is(QueryParameter.Dead))
                 {
-                    if (results[item] > max && !TargetingSystem.GetCreatureByPosition(item.Item2, manager).Is(QueryParameter.Dead))
-                    {
-                        max = results[item];
-                        maxItem = item;
-                    }
+                    max = results[item];
+                    maxItem = item;
                 }
-
-                return (maxItem.Item1, maxItem.Item2);
             }
-            return (0, 0);
+            return (maxItem.Item1, maxItem.Item2);
         }
 
         private void TryAllPossibleTargets(Query origQuery, List<int> pos, Dictionary<(int, int), double> results, int i)
@@ -123,11 +129,10 @@ namespace DeepCrawlSims.AI
             }
         }
 
-        private bool ActionHasViableTargets(Query query, Creature creature)
+        private bool DoesActionHaveViableTargets(Query query, Creature creature)
         {
             List<QueryParameter> keys = new List<QueryParameter>(query.parameters.Keys);
-            List<int> pos = TargetingSystem.PickViableTargets(keys, creature.isOppositeSide);
-
+            List<int> pos = TargetingSystem.ListViableTargets(keys, creature.isOnOpposingSide);
             bool viableTargetFound = false;
 
             foreach (var item in pos)
@@ -141,11 +146,10 @@ namespace DeepCrawlSims.AI
         public Creature PickRandomTarget(Query query, Creature creature)
         {
             List<QueryParameter> keys = new List<QueryParameter>(query.parameters.Keys);
-            List<int> pos = TargetingSystem.PickViableTargets(keys, creature.isOppositeSide);
+            List<int> pos = TargetingSystem.ListViableTargets(keys, creature.isOnOpposingSide);
             var targetFound = false;
             Creature cre = null;
 
-            //at the moment its random
             while (!targetFound)
             {
                 Random rnd = new Random();

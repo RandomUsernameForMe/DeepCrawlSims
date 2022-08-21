@@ -9,7 +9,7 @@ public class LongWeapon : Component
 {
     public override Query ProcessQuery(Query action)
     {
-        if (action.type == QueryType.AttackBuild)
+        if (action.type == QueryType.AttackBuilder)
         {
             if (action.parameters.ContainsKey(QueryParameter.Basic))
             {

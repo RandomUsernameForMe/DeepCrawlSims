@@ -13,7 +13,7 @@ namespace DeepCrawlSims.PartyNamespace
     /// Ally party is transfered in between senes, Enemy party is generated in each battle.
     /// </summary>
     [Serializable()]
-    public class Party 
+    public class Party
     {
         private List<Creature> creatures;
 
@@ -31,22 +31,21 @@ namespace DeepCrawlSims.PartyNamespace
         {
             for (int i = 0; i < Creatures.Count; i++)
             {
-                
+
                 Creature creature = Creatures[i];
                 var effects = creature.FetchComponents<TimedEffect>();
 
                 for (int j = 0; j < effects.Count; j++)
                 {
                     var item = effects[j];
-                    if (item.active)
+
+                    Query action = item.Tick();
+                    object p = creature.ProcessQuery(action);
+                    if (item.timer <= 0)
                     {
-                        Query action = item.Tick();
-                        object p = creature.ProcessQuery(action);
-                        if (item.timer <= 0)
-                        {
-                            creature.components.Remove(item);
-                        }
+                        creature.components.Remove(item);
                     }
+
                 }
             }
         }
@@ -90,7 +89,7 @@ namespace DeepCrawlSims.PartyNamespace
         {
             foreach (var item in creatures)
             {
-                item.isOppositeSide = v;
+                item.isOnOpposingSide = v;
             }
             return this;
         }

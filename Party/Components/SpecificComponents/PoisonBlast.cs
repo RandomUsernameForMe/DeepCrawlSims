@@ -4,48 +4,47 @@ using System;
 using DeepCrawlSims.QueryNamespace;
 
 [Serializable()]
-public class PoisonBlast: UpgradableComponent
+public class PoisonBlast : UpgradableComponent
 {
     public int potency = 10;
     public int duration = 2;
     private int upgradeLevel = 1;
 
-    public override Query ProcessQuery(Query action)
+    public override Query ProcessQuery(Query query)
     {
-        if (action.type == QueryType.AttackBuild)
+        if (query.type == QueryType.AttackBuilder)
         {
-            if (action.parameters.ContainsKey(QueryParameter.Special))
+            if (query.parameters.ContainsKey(QueryParameter.Special))
             {
-                action.Add(QueryParameter.Poison,new Poison(potency, duration));
+                query.Add(QueryParameter.Poison, new Poison(potency, duration));
             }
         }
-        if (action.type == QueryType.Description)
+        if (query.type == QueryType.Description)
         {
-            if (action.parameters.ContainsKey(QueryParameter.SpecialName))
+            if (query.parameters.ContainsKey(QueryParameter.SpecialName))
             {
-                action.Add("Poison Blast");
+                query.Add("Poison Blast");
             }
-            if (action.parameters.ContainsKey(QueryParameter.Special))
+            if (query.parameters.ContainsKey(QueryParameter.Special))
             {
-                action.Add("Blasts an enemy with a powerful toxin.");
+                query.Add("Blasts an enemy with a powerful toxin.");
             }
-            if (action.parameters.ContainsKey(QueryParameter.Tooltip))
+            if (query.parameters.ContainsKey(QueryParameter.Tooltip))
             {
-                action.Add(String.Format("Poison: {0} dmg, {1} turn(s)", potency, duration));
+                query.Add(String.Format("Poison: {0} dmg, {1} turn(s)", potency, duration));
             }
         }
-        return action;
+        return query;
     }
 
-    public override List<(Type,Type)> GetRequirements()
+    public override List<(Type, Type)> GetRequirements()
     {
         var returnValue = new List<(Type, Type)>();
         returnValue.Add((typeof(PoisonBlast), typeof(Health)));
         return returnValue;
     }
 
-
-        public override bool TryUpgrade(bool positive)
+    public override bool TryUpgrade(bool positive)
     {
         int newlvl = upgradeLevel;
         if (positive) newlvl++;
@@ -86,7 +85,6 @@ public class Poison : TimedEffect
         this.timer = poisonTimer;
     }
 
-
     public override List<(Type, Type)> GetRequirements()
     {
         return null;
@@ -105,7 +103,7 @@ public class Poison : TimedEffect
         {
             if (query.effects.ContainsKey(QueryParameter.Poison))
             {
-                timer = Math.Max(2,timer);
+                timer = Math.Max(2, timer);
                 potency = Math.Max(potency, (query.effects[QueryParameter.Poison] as Poison).potency);
                 query.effects.Remove(QueryParameter.Poison);
             }
@@ -124,13 +122,6 @@ public class Poison : TimedEffect
         action.Add(QueryParameter.TrueDmg, potency);
         timer -= 1;
         return action;
-    }
-
-    public void Set(double potency, int duration)
-    {
-        this.potency = potency;
-        this.timer = duration;
-        active = true;
     }
 }
 

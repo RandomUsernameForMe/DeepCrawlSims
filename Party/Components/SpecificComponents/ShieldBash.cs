@@ -19,7 +19,7 @@ public class ShieldBash : UpgradableComponent
 
     public override Query ProcessQuery(Query query)
     {
-        if (query.type == QueryType.AttackBuild)
+        if (query.type == QueryType.AttackBuilder)
         {
             if (query.parameters.ContainsKey(QueryParameter.Special))
             {

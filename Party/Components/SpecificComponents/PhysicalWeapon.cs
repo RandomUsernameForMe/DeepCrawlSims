@@ -10,7 +10,7 @@ namespace DeepCrawlSims.PartyNamespace
     [Serializable]
     public class PhysicalWeapon : UpgradableComponent
     {
-        public int power = 15;
+        public int power = 10;
         public override List<(Type, Type)> GetRequirements()
         {
             var returnValue = new List<(Type, Type)>();
@@ -20,7 +20,7 @@ namespace DeepCrawlSims.PartyNamespace
 
         public override Query ProcessQuery(Query action)
         {
-            if (action.type == QueryType.AttackBuild)
+            if (action.type == QueryType.AttackBuilder)
             {
                 if (action.parameters.ContainsKey(QueryParameter.Basic))
                 {

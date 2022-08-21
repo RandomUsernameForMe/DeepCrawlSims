@@ -17,13 +17,13 @@ namespace DeepCrawlSims.PartyNamespace
     {
         public string name;
         public Controller controller;
-        public bool isOppositeSide;
+        public bool isOnOpposingSide;
         public List<Component> components;
 
         public Creature(string name, bool isEnemy)
         {
             this.name = name;            
-            this.isOppositeSide = isEnemy;
+            this.isOnOpposingSide = isEnemy;
             controller = new Controller();
             components = new List<Component>();
         }
@@ -31,7 +31,7 @@ namespace DeepCrawlSims.PartyNamespace
         public Creature()
         {
             this.name = "defaultName";
-            this.isOppositeSide = false;
+            this.isOnOpposingSide = false;
             controller = new Controller();
             components = new List<Component>();
         }
@@ -91,13 +91,19 @@ namespace DeepCrawlSims.PartyNamespace
             {
                 if (query.type == QueryType.Attack)
                 {
-                    //item.BuildStatusEffect(gameObject);
-                    //components = new List<StatusEffect>(GetComponentsInChildren<StatusEffect>());
+                    components.Add(item);
                 }
             }
             return query;
         }
 
+        public string GetNameWithAlegience()
+        {
+            var rtr = name;
+            if (isOnOpposingSide) rtr += " (enemy)";
+            else rtr += " (ally)";
+            return rtr;
+        }
 
         internal T FetchComponent<T>() where T : Component
         {
@@ -119,10 +125,7 @@ namespace DeepCrawlSims.PartyNamespace
 
         void RemoveComponents<T>()
         {
-            foreach (var item in components)
-            {
-                if (item is T) components.Remove(item);
-            }            
+            components.RemoveAll(i => (i is T));   
         }
 
         public double GetHealth()

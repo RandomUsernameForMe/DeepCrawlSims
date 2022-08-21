@@ -1,4 +1,5 @@
 using DeepCrawlSims.QueryNamespace;
+using DeepCrawlSims.Simulations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -45,7 +46,14 @@ public class Health : UpgradableComponent
         
         if (query.type == QueryType.Attack)
         {
-            health += healthChange;            
+            // mostly for debugging purposes
+            if (Global.verbose)
+            {
+                Console.WriteLine(String.Format("Target's health changed by {0}. ({1} remaining) ", healthChange, health+healthChange));
+                if (health + healthChange <= 0) Console.WriteLine("Target dieded");
+            }
+            health += healthChange;     
+            
         }
         
         if (query.type == QueryType.Question)

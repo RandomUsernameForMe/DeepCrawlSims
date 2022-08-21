@@ -15,43 +15,47 @@ public class Claws : UpgradableComponent
         return returnValue;
     }
 
-    public override Query ProcessQuery(Query action)
+    public override Query ProcessQuery(Query query)
     {
-        if (action.type == QueryType.AttackBuild)
+        if (query.type == QueryType.AttackBuilder)
         {
-            if (action.parameters.ContainsKey(QueryParameter.Special))
+            if (query.parameters.ContainsKey(QueryParameter.Special))
             {                
-                action.Add(QueryParameter.Enemy, 1);
-                action.Add(QueryParameter.Claws, new Clawed());
+                query.Add(QueryParameter.Enemy, 1);
+                query.Add(QueryParameter.Claws, new Clawed(strength,2));
+                query.Add(QueryParameter.PhysDmg, strength);
             }
         }
-        if (action.type == QueryType.Description)
+        if (query.type == QueryType.Description)
         {
-            if (action.parameters.ContainsKey(QueryParameter.Special))
+            if (query.parameters.ContainsKey(QueryParameter.Special))
             {
-                action.Add("Cuts into damaged flesh. Does more damage to already clawed enemies.");
+                query.Add("Cuts into damaged flesh. Does more damage to already clawed enemies.");
             }
-            if (action.parameters.ContainsKey(QueryParameter.SpecialName))
+            if (query.parameters.ContainsKey(QueryParameter.SpecialName))
             {
-                action.Add("Claw attack");
+                query.Add("Claw attack");
             }
-            if (action.parameters.ContainsKey(QueryParameter.Tooltip))
+            if (query.parameters.ContainsKey(QueryParameter.Tooltip))
             {
-                action.Add(String.Format("Claws: {0} dmg, 2x to clawed enemies", strength));
+                query.Add(String.Format("Claws: {0} dmg, 2x to clawed enemies", strength));
             }
         }
-        return action;
+        return query;
     }
 
     public override bool TryUpgrade(bool positive)
     {
-        if (strength <= 5)
-        {
-            //Destroy(this);
-            return true;
-        }
+
         if (positive) strength += 5;
-        else strength -= 5;
+        else
+        {
+            if (strength <= 5)
+            {
+                return true;
+            }
+            strength -= 5;
+        }
         return true;
     }
 }
@@ -59,6 +63,13 @@ public class Claws : UpgradableComponent
 public class Clawed : TimedEffect
 {
     int intensity;
+
+
+    public Clawed(int str, int time)
+    {
+        intensity = str;
+        timer = time;
+    }
     public override List<(Type, Type)> GetRequirements()
     {
         var returnValue = new List<(Type, Type)>();
@@ -70,7 +81,7 @@ public class Clawed : TimedEffect
     {
         if (query.type == QueryType.Attack)
         {
-            if (query.parameters.ContainsKey(QueryParameter.Claws))
+            if (query.effects.ContainsKey(QueryParameter.Claws))
             {
                 query.parameters[QueryParameter.PhysDmg] += intensity;
                 timer++;
@@ -91,11 +102,5 @@ public class Clawed : TimedEffect
     {
         timer = timer - 1;
         return new Query(QueryType.None);
-    }
-
-    internal void Set(int strength)
-    {
-        intensity = strength;
-        timer = 3;
     }
 }

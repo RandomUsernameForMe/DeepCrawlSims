@@ -32,10 +32,11 @@ public class SimulationRunner
         var watch = System.Diagnostics.Stopwatch.StartNew();
         var results = new List<BattleResults>();
 
-        // We create a new thread for every 100 simulated battles. The count is arbitrarily chosen.
-        for (int i = 0; i < simCount; i+=100)
+        int taskCount = simCount / 100 + 1;
+        // We create a new task for every 100 simulated battles. 
+        for (int i = 0; i < taskCount; i++)
         {
-            var result = await Task.Run(() => RunBattles(manager,100));            
+            var result = await Task.Run(() => RunBattles(manager,Math.Min(simCount-i*100,100)));            
             results.AddRange(result);                     
         }
 

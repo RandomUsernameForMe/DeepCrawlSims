@@ -8,6 +8,10 @@ using System.Text;
 
 namespace DeepCrawlSims.Simulations
 {
+    public static class Global
+    {
+        public static bool verbose = false;
+    }
     /// <summary>
     /// All the UI user interacts with using the program. Its a pseudostate machine switching between states of the menu 
     /// </summary>
@@ -28,7 +32,7 @@ namespace DeepCrawlSims.Simulations
 
         public void RunUI()
         {
-            simRunner = new SimulationRunner(manager, 1000);
+            simRunner = new SimulationRunner(manager, 100);
             while (command != 0)
             {
                 switch (command)
@@ -102,18 +106,21 @@ namespace DeepCrawlSims.Simulations
         public void ShowMainMenu()
         {
             Console.Clear();
+            if (Global.verbose) Console.WriteLine("Verbose mode is turned ON");
             Console.WriteLine("What do you want to do now? (enter apropriate number)");
             Console.WriteLine("1 = Show/modify first party");
             Console.WriteLine("2 = Show/show second party");
             Console.WriteLine("3 = Save setup to file");
             Console.WriteLine("4 = Load setup from file");
             Console.WriteLine("5 = Modify number of simulations");
-            Console.WriteLine("6 = Run simulations");
+            Console.WriteLine("6 = Switch verbose mode ON/OFF");
+            Console.WriteLine("7 = Run simulations");
 
             int input=0;
             while (input == 0)
             {
-                input = Console.ReadLine()[0] -'0';
+                string inp = Console.ReadLine(); 
+                if (inp.Length>0) input = inp[0] -'0';
             }
 
             switch (input)
@@ -134,6 +141,9 @@ namespace DeepCrawlSims.Simulations
                     ChangeSimulationsCountMenu(simRunner);
                     break;
                 case 6:
+                    Global.verbose = !Global.verbose;
+                    break;
+                case 7:
                     command = 2;
                     break;
             }
@@ -185,7 +195,7 @@ namespace DeepCrawlSims.Simulations
                 manager.allyParty = PartySerializer.Deserialize(String.Format("{0}",filename));
                 foreach (var item in manager.enemyParty.Creatures)
                 {
-                    item.isOppositeSide = false;
+                    item.isOnOpposingSide = false;
                 }
             }
             else
@@ -193,7 +203,7 @@ namespace DeepCrawlSims.Simulations
                 manager.enemyParty = PartySerializer.Deserialize(String.Format("{0}", filename));
                 foreach (var item in manager.enemyParty.Creatures)
                 {
-                    item.isOppositeSide = true;
+                    item.isOnOpposingSide = true;
                 }
             }
             Console.WriteLine("Succesfully loaded.");
@@ -249,8 +259,8 @@ namespace DeepCrawlSims.Simulations
             int simCount = 0;
             while (simCount == 0)
             {
-                Console.ReadLine();
-                int.TryParse("123", out simCount);
+                
+                int.TryParse(Console.ReadLine(), out simCount);
                 if (simCount <= 0)
                 {
                     Console.WriteLine("Wrong number!");

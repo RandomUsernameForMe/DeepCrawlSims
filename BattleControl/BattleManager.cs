@@ -1,6 +1,7 @@
 ﻿using DeepCrawlSims.AI;
 using DeepCrawlSims.PartyNamespace;
 using DeepCrawlSims.QueryNamespace;
+using DeepCrawlSims.Simulations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +49,6 @@ namespace DeepCrawlSims.BattleControl
             controller.manager = this;
             isRunning = true;
         }
-
 
         public void RunOneTurn()
         {
@@ -103,11 +103,12 @@ namespace DeepCrawlSims.BattleControl
                 skipCounter = 0;
             }
 
-            if (query.type == QueryType.Attack || query.type == QueryType.AttackBuild)
+            if (query.type == QueryType.Attack || query.type == QueryType.AttackBuilder)
             {
-                // I want to play possible animations first because processing query through creatures might modify it
-                query.type = QueryType.Animation;
-                currentCreature.ProcessQuery(query);
+                // mostly for debugging purposes
+                if (Global.verbose) if (query.parameters.ContainsKey(QueryParameter.Basic)) 
+                        Console.WriteLine(String.Format("{0} performs a basic attack targetting {1}.", currentCreature.GetNameWithAlegience(), target.GetNameWithAlegience()));
+                else Console.WriteLine(String.Format("{0} performs its special ability targetting {1}.", currentCreature.GetNameWithAlegience(),target.GetNameWithAlegience()));
 
                 // And now i want the actually attack to proceed
                 query.type = QueryType.Attack;
@@ -116,7 +117,7 @@ namespace DeepCrawlSims.BattleControl
         }
 
         /// <summary>
-        /// Make a new creature take turn
+        /// Assign a new creature to take turn 
         /// </summary>
         void NextCreaturesTurn()
         {
@@ -184,15 +185,17 @@ namespace DeepCrawlSims.BattleControl
             {
                 enemyMaxHPs.Add(item.GetMaxHealth());
             }
+            if (Global.verbose)
+            {
+                Console.WriteLine(String.Format("Starting HP: ({0},{1},{2},{3}) vs. ({4},{5},{6},{7})",
+                    allyMaxHPs[0], allyMaxHPs[1], allyMaxHPs[2], allyMaxHPs[3],
+                    enemyMaxHPs[0], enemyMaxHPs[1], enemyMaxHPs[2], enemyMaxHPs[3]));
 
-            Console.WriteLine(String.Format("Starting HP: ({0},{1},{2},{3}) vs. ({4},{5},{6},{7})",
-                allyMaxHPs[0], allyMaxHPs[1], allyMaxHPs[2], allyMaxHPs[3],
-                enemyMaxHPs[0], enemyMaxHPs[1], enemyMaxHPs[2], enemyMaxHPs[3]));
+                Console.WriteLine(String.Format("Result HP: ({0},{1},{2},{3},) vs. ({4},{5},{6},{7})",
+                    retVal.allyHPs[0], retVal.allyHPs[1], retVal.allyHPs[2], retVal.allyHPs[3],
+                    retVal.enemyHPs[0], retVal.enemyHPs[1], retVal.enemyHPs[2], retVal.enemyHPs[3]));
 
-            Console.WriteLine(String.Format("Result HP: ({0},{1},{2},{3},) vs. ({4},{5},{6},{7})",
-                retVal.allyHPs[0], retVal.allyHPs[1], retVal.allyHPs[2], retVal.allyHPs[3],
-                retVal.enemyHPs[0], retVal.enemyHPs[1], retVal.enemyHPs[2], retVal.enemyHPs[3]));
-
+            }
             return retVal;
         }
 

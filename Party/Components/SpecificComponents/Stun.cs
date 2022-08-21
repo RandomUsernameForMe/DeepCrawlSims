@@ -35,12 +35,6 @@ public class Stun : TimedEffect
         return action;
     }
 
-    internal void Set(int duration)
-    {
-        this.timer = duration;
-        active = true;
-    }
-
     public override Query Tick()
     {
         timer -= 1;
