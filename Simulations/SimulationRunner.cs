@@ -33,13 +33,30 @@ public class SimulationRunner
         var results = new List<BattleResults>();
 
         int taskCount = simCount / 100 + 1;
-        // We create a new task for every 100 simulated battles. 
-        for (int i = 0; i < taskCount; i++)
-        {
-            var result = await Task.Run(() => RunBattles(manager,Math.Min(simCount-i*100,100)));            
-            results.AddRange(result);                     
-        }
 
+        var threading = false;
+        if (threading)
+        {
+            object lck = new object();
+            Parallel.For(0, taskCount, (i, state) =>
+            {
+                var tempResults = RunBattles(manager, Math.Min(simCount - i * 100, 100));
+                lock (lck)
+                {
+                    results.AddRange(tempResults);
+                }
+            });
+
+        }
+        else
+        {
+            // We create a new task for every 100 simulated battles. 
+            for (int i = 0; i < taskCount; i++)
+            {
+                var result = await Task.Run(() => RunBattles(manager,Math.Min(simCount-i*100,100)));            
+                results.AddRange(result);                     
+            }
+        }
         // Show output after simulations have finished
         ShowResultsSummary(results);
         watch.Stop();
@@ -66,6 +83,7 @@ public class SimulationRunner
             {
                 newManager.RunOneTurn();
             }
+            Console.WriteLine("Finished Battle");
             results.Add(newManager.results);
             newManager.Reset();
         }        
