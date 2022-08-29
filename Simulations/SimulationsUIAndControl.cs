@@ -11,6 +11,7 @@ namespace DeepCrawlSims.Simulations
     public static class Global
     {
         public static bool verbose = false;
+        public static bool multithread = false;
     }
     /// <summary>
     /// All the UI user interacts with using the program. Its a pseudostate machine switching between states of the menu 
@@ -19,7 +20,6 @@ namespace DeepCrawlSims.Simulations
     {
         const int RUN_CONST = 2;
         const int MENU_CONST = 1;
-        const int BUSY_CONST = 3;
 
         BattleManager manager;
         SimulationRunner simRunner;
@@ -40,17 +40,14 @@ namespace DeepCrawlSims.Simulations
                     case MENU_CONST:
                         ShowMainMenu();
                         break;
-                    case RUN_CONST:                        
+                    case RUN_CONST:
+                        Console.WriteLine("...");
+                        Console.WriteLine("Running simulations...");
                         simRunner.Run();
-                        command = BUSY_CONST;
-                        break;
-                    case BUSY_CONST:
-                        if (simRunner.finished)
-                        {
-                            command = MENU_CONST;
-                            simRunner.finished = false;
-                        }
-                        break;
+                        Console.WriteLine($"Press Enter to continue");
+                        Console.ReadLine();
+                        command = MENU_CONST;
+                        break;                   
                 }
             }
         }
@@ -106,7 +103,10 @@ namespace DeepCrawlSims.Simulations
         public void ShowMainMenu()
         {
             Console.Clear();
-            if (Global.verbose) Console.WriteLine("Verbose mode is turned ON");
+            Console.WriteLine("Verbose mode is turned " + (Global.verbose ? "ON" : "OFF"));
+            Console.WriteLine("Multithreading mode is turned " + (Global.multithread ? "ON" : "OFF"));
+            Console.WriteLine("Current number of simulations to run: " + simRunner.simCount);
+            Console.WriteLine();
             Console.WriteLine("What do you want to do now? (enter apropriate number)");
             Console.WriteLine("1 = Show/modify first party");
             Console.WriteLine("2 = Show/show second party");
@@ -114,7 +114,8 @@ namespace DeepCrawlSims.Simulations
             Console.WriteLine("4 = Load setup from file");
             Console.WriteLine("5 = Modify number of simulations");
             Console.WriteLine("6 = Switch verbose mode ON/OFF");
-            Console.WriteLine("7 = Run simulations");
+            Console.WriteLine("7 = Switch multithreading mode ON/OFF");
+            Console.WriteLine("8 = Run simulations");
 
             int input=0;
             while (input == 0)
@@ -144,6 +145,9 @@ namespace DeepCrawlSims.Simulations
                     Global.verbose = !Global.verbose;
                     break;
                 case 7:
+                    Global.multithread = !Global.multithread;
+                    break;
+                case 8:
                     command = 2;
                     break;
             }
@@ -170,8 +174,7 @@ namespace DeepCrawlSims.Simulations
             Console.WriteLine("Available saved parties:");
             var files = Directory.EnumerateFiles("Setups", "*");
             foreach (string file in files)
-            {
-                
+            {                
                 Console.WriteLine(file.Remove(0, 7));
             }
             string filename = "";
@@ -190,23 +193,33 @@ namespace DeepCrawlSims.Simulations
                 }
             }
 
-            if (partyPick == "ally")
+            try
             {
-                manager.allyParty = PartySerializer.Deserialize(String.Format("{0}",filename));
-                foreach (var item in manager.enemyParty.Creatures)
+                if (partyPick == "ally")
                 {
-                    item.isOnOpposingSide = false;
+                    manager.allyParty = PartySerializer.Deserialize(String.Format("{0}", filename));
+                    foreach (var item in manager.enemyParty.Creatures)
+                    {
+                        item.isOnOpposingSide = false;
+                    }
                 }
+                else
+                {
+                    manager.enemyParty = PartySerializer.Deserialize(String.Format("{0}", filename));
+                    foreach (var item in manager.enemyParty.Creatures)
+                    {
+                        item.isOnOpposingSide = true;
+                    }
+                }
+                Console.WriteLine("Succesfully loaded.");
             }
-            else
+            catch
             {
-                manager.enemyParty = PartySerializer.Deserialize(String.Format("{0}", filename));
-                foreach (var item in manager.enemyParty.Creatures)
-                {
-                    item.isOnOpposingSide = true;
-                }
+                Console.WriteLine("Unsuccesfully loaded. Something went wrong.");
+                Console.WriteLine("Press Enter to continue");
+                Console.ReadLine();
             }
-            Console.WriteLine("Succesfully loaded.");
+
         }
 
         /// <summary>

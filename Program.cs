@@ -11,6 +11,7 @@ namespace DeepCrawlSims
         {
             var allyParty = TeamBuilder.CreateTeamOne();
             var enemyParty = TeamBuilder.CreateTeamTwo().MakeOppositeSide(true);
+            System.IO.Directory.CreateDirectory("Setups");
             PartySerializer.Serialize(allyParty, "Setups/defaultAlly");
             PartySerializer.Serialize(enemyParty, "Setups/defaultEnemy");
 

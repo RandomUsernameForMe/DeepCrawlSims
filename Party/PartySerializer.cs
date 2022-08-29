@@ -14,10 +14,10 @@ class PartySerializer
         Party party = new Party();
         FileStream filestream;
         if (File.Exists(filename))
-        {
+        {           
             filestream = File.OpenRead(filename);
             party = (Party)formatter.Deserialize(filestream);
-            filestream.Close();
+            filestream.Close();            
         }
         else throw new FileLoadException();
         return party;

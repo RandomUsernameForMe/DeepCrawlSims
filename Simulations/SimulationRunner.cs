@@ -2,6 +2,7 @@
 using DeepCrawlSims.AI;
 using DeepCrawlSims.BattleControl;
 using DeepCrawlSims.PartyNamespace;
+using DeepCrawlSims.Simulations;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -19,7 +20,6 @@ public class SimulationRunner
 {
     public BattleManager manager;
     public int simCount = 100;
-    public bool finished = false;
 
     public SimulationRunner(BattleManager manager, int simCount)
     {
@@ -27,22 +27,16 @@ public class SimulationRunner
         this.simCount = simCount;
     }
 
-    internal async void Run()
+    internal void Run()
     {
         var watch = System.Diagnostics.Stopwatch.StartNew();
-        var results = new List<BattleResults>();
+        var results = new List<BattleResults>();            
 
-        if (threading)
-        {
-            int taskCount = simCount / 100 + 1;
-        }
-
-        int taskCount = simCount / 100 + 1;
-
-        var threading = false;
-        if (threading)
+        if (Global.multithread)
+        // One thread for every 100 battles
         {
             object lck = new object();
+            int taskCount = simCount / 100 + 1;
             Parallel.For(0, taskCount, (i, state) =>
             {
                 var tempResults = RunBattles(manager, Math.Min(simCount - i * 100, 100));
@@ -51,24 +45,18 @@ public class SimulationRunner
                     results.AddRange(tempResults);
                 }
             });
-
         }
         else
+        // Simple non-parallel simulations
         {
-            // We create a new task for every 100 simulated battles. 
-            for (int i = 0; i < taskCount; i++)
-            {
-                var result = await Task.Run(() => RunBattles(manager,Math.Min(simCount-i*100,100)));            
-                results.AddRange(result);                     
-            }
+            var result = RunBattles(manager, simCount);
+            results.AddRange(result);
         }
+
         // Show output after simulations have finished
         ShowResultsSummary(results);
         watch.Stop();
         Console.WriteLine($"Execution Time: {watch.ElapsedMilliseconds} ms");
-        Console.WriteLine($"Press Any Key to continue");
-        Console.ReadLine();
-        finished = true;
     }
 
     private List<BattleResults> RunBattles(BattleManager manager,int battleCount)
@@ -88,13 +76,11 @@ public class SimulationRunner
             {
                 newManager.RunOneTurn();
             }
-            Console.WriteLine("Finished Battle");
             results.Add(newManager.results);
             newManager.Reset();
         }        
         return results;
     } 
-
     
     /// <summary>
     /// Writes to console a summary of results after all desired simulations have finished
