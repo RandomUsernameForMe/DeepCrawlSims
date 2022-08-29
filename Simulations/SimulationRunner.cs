@@ -32,6 +32,11 @@ public class SimulationRunner
         var watch = System.Diagnostics.Stopwatch.StartNew();
         var results = new List<BattleResults>();
 
+        if (threading)
+        {
+            int taskCount = simCount / 100 + 1;
+        }
+
         int taskCount = simCount / 100 + 1;
         // We create a new task for every 100 simulated battles. 
         for (int i = 0; i < taskCount; i++)
